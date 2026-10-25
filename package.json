@@ -1,0 +1,9 @@
+{
+ "name":"graphite-industries-corporate",
+ "private":true,
+ "version":"1.0.0",
+ "description":"Custom PHP/MySQL corporate website and CMS; no Node runtime required for hosting",
+ "scripts":{"test":"php tests/integration.php","test:mysql":"php tests/integration.php --mysql","test:browser":"node tests/browser.cjs","test:wasm":"node tests/integration.mjs","build:preview":"python3 bin/build-preview.py"},
+ "devDependencies":{"@php-wasm/node":"3.1.60","@php-wasm/universal":"3.1.60"},
+ "engines":{"node":">=24.18.0"}
+}

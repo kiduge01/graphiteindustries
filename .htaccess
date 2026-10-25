@@ -1,0 +1,12 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# A root redirect alone does not protect private application files.
+RewriteEngine On
+RewriteRule ^robots\.txt$ public/robots.php [L]
+RewriteRule ^(?:app|bin|database|storage|tests|node_modules)(?:/|$) - [F,L,NC]
+RewriteRule (^|/)\. - [F,L]
+
+<FilesMatch "(?i)^(?:.*\.md|package(?:-lock)?\.json|composer\.(?:json|lock))$">
+    Require all denied
+</FilesMatch>

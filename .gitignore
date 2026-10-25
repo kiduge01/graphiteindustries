@@ -1,0 +1,9 @@
+app/config.php
+storage/*
+public/uploads/*
+!public/uploads/.htaccess
+node_modules/
+.env
+.env.*
+*.log
+/gf.zip

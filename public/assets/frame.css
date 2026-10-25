@@ -1,0 +1,74 @@
+/* Separate navigation and content surfaces, inspired by the supplied layout. */
+:root{--frame-gap:22px;--frame-inset:24px;--frame-radius:28px;--frame-bg:#dce0d8}
+body,body.admin{padding:var(--frame-inset);background:var(--frame-bg)}
+.sidebar,.admin .sidebar{inset:var(--frame-inset) auto var(--frame-inset) var(--frame-inset);width:var(--side);border:1px solid #ffffffb3;border-radius:var(--frame-radius);background:#fff;color:#283c30;padding:30px 20px 24px;box-shadow:0 8px 32px #263a2a05;scrollbar-width:thin;scrollbar-color:#c9d4c5 transparent}
+.site-wrap,.admin-wrap{margin-left:calc(var(--side) + var(--frame-gap));border-radius:var(--frame-radius);overflow:clip;background:#fafbf7;min-height:calc(100vh - var(--frame-inset)*2);border:1px solid #ffffff99;box-shadow:0 12px 45px #263a2a06}
+.sidebar .brand,.admin .sidebar .brand{color:#25392c;margin-bottom:34px;gap:15px}
+.sidebar .brand img,.admin .sidebar .brand img{box-shadow:none;width:112px;height:100px;border-radius:0}
+.sidebar .brand span,.admin .sidebar .brand span{font-size:20px;letter-spacing:.13em}
+.sidebar .brand small,.admin .sidebar .brand small{color:#657364;font-size:8px;letter-spacing:.16em}
+.sidebar .nav-label,.admin .sidebar .nav-label{color:#7b8879;font-size:8px;letter-spacing:.12em;margin:0 14px 15px}
+.sidebar nav a,.admin .sidebar nav a{color:#586354;padding:13px 14px;font-size:12px;border:0;border-radius:11px;margin:5px 0;min-height:43px;position:relative}
+.sidebar nav a:hover,.admin .sidebar nav a:hover{background:#f0f4eb;color:#174a3a}
+.sidebar nav a.active,.admin .sidebar nav a.active{background:#e2ebd7;color:#174a3a;border:0;box-shadow:inset 4px 0 0 #174a3a;font-weight:600}
+.sidebar nav a.active span,.admin .sidebar nav a.active span{color:#174a3a}
+.admin .sidebar nav a i{color:#788b72}
+.sidebar .side-bottom{border:0;border-radius:17px;background:#26392d;color:#f0f5ec;padding:22px 18px 17px;margin-top:auto;letter-spacing:.1em}
+.sidebar .side-bottom small{color:#c1cdbb;font-size:10px;line-height:1.8}
+.sidebar .side-bottom>a,.admin .sidebar .side-bottom>a{border-color:#ffffff20;color:#f0f5ec;font-size:11px;padding-top:14px;margin-top:15px}
+.admin .sidebar .side-bottom button{color:#c1cdbb;font-size:11px}
+.sidebar .status-dot{background:#b6c99e}
+.utility{height:70px;background:transparent;border-bottom:0;padding:0 5%}
+.quiet-hero{margin:0 14px;border-radius:22px;min-height:610px;padding:75px 6% 110px}
+.quiet-hero h1{font-size:clamp(46px,5vw,72px)}
+.quiet-hero .hero-bottom{left:6%;right:6%}
+.quiet-hero .image-caption{right:6%}
+.section{padding-left:6%;padding-right:6%}
+.home-introduction{padding-top:65px;padding-bottom:60px}
+.home-introduction h2{font-size:clamp(32px,3.5vw,48px)}
+.explore-grid{margin:0 24px 24px;gap:14px;min-height:340px}
+.explore-tile{border-radius:19px;min-height:340px;padding:27px}
+.explore-tile h2{font-size:29px}
+.tile-top{font-size:8px}
+.tile-action{font-size:10px}
+.page-cover{margin:0 14px;border:0;border-radius:22px;overflow:hidden;background:#f0f3eb;min-height:430px}
+.cover-copy{padding:60px 9% 60px 10%}
+.cover-image{min-height:430px}
+.page-cover:not(.has-image){min-height:0}
+.page-cover:not(.has-image) .cover-copy{padding:55px 5%}
+.page-heading{margin:0 14px;padding:55px 5% 40px;background:#f0f3eb;border-radius:22px}
+.next-chapter{margin:0 14px 20px;border:0;border-radius:20px;padding:42px 5%;background:#eaf0e2}
+.principles,.project-development,.product-collection{margin:0 14px 20px;border-radius:22px;background:#eef2e8}
+.partner-grid{gap:14px;border:0}
+.partner-grid a{border:1px solid #e0e6d9;border-radius:16px;background:#fff;min-height:165px}
+.partner-grid a:hover{background:#edf3e6}
+.contact-layout .panel{border:1px solid #e2e7dc;border-radius:20px;background:#fff;padding:30px}
+.contact-layout input,.contact-layout select,.contact-layout textarea{border-radius:8px;background:#fbfcf8}
+.contact-layout .btn{border-radius:9px}
+footer{margin:14px;border-radius:22px;padding:48px 5% 22px}
+.footer-top h2{font-size:clamp(27px,3vw,39px)}
+.footer-top .btn{border-radius:9px}
+.consent{border-radius:17px;border-color:#e3e9de;box-shadow:0 12px 50px #263a2a16}
+.consent .btn{border-radius:7px}
+.admin-wrap{margin-left:calc(var(--side) + var(--frame-gap));background:#f8faf4}
+.admin-top{background:transparent;height:76px;border-color:#e5eadd;padding-left:32px;padding-right:32px}
+.admin #admin-main{padding:32px}
+.admin .panel,.metric,.media-tile{border-radius:18px;border-color:#e6ebdf;box-shadow:none}
+.metric{padding:25px;background:#fff}
+.metric .metric-icon{border-radius:10px;background:#edf3e5}
+.admin .btn,.table-btn{border-radius:9px}
+.admin input,.admin select,.admin textarea{border-radius:8px}
+.admin .quick b{border-radius:10px;background:#eaf1e1}
+.admin .upload-box{border-radius:17px;background:#edf3e5;border-color:#b6c6aa}
+.image-preview{border-radius:12px}
+.admin-foot{padding:20px 32px}
+body.admin:has(.login-page){padding:var(--frame-inset)}
+.login-page{min-height:calc(100vh - var(--frame-inset)*2);border-radius:var(--frame-radius);overflow:hidden;background:#fafbf7}
+.login-art{border-radius:var(--frame-radius);margin:12px;min-height:calc(100vh - var(--frame-inset)*2 - 24px)}
+.login-form .btn,.login-form input{border-radius:9px}
+@media(min-width:1700px){:root{--frame-inset:32px;--frame-gap:28px}.quiet-hero{min-height:730px}.explore-tile{min-height:420px}}
+@media(max-width:1200px){:root{--frame-inset:18px;--frame-gap:18px}.sidebar,.admin .sidebar{padding:27px 16px 20px}.sidebar .brand span,.admin .sidebar .brand span{font-size:18px}.quiet-hero{min-height:600px}.quiet-hero h1{font-size:58px}.cover-copy h1{font-size:41px}.cover-image{min-height:400px}.page-cover{min-height:400px}.explore-grid{margin-left:18px;margin-right:18px;gap:12px}.explore-tile{padding:23px;min-height:320px}.explore-tile h2{font-size:27px}.admin #admin-main{padding:27px}}
+@media(max-width:1000px){.responsibility-tile{min-height:210px}.footer-top{align-items:flex-start}.footer-top .btn{gap:15px}.cover-copy h1{font-size:37px}.cover-copy{padding:45px 9%}.cover-copy .lead{font-size:14px}.admin .sidebar nav a{font-size:11px}.home-introduction>div{align-items:flex-start;flex-direction:column;gap:25px}}
+@media(max-width:850px){:root{--frame-inset:12px;--frame-gap:0px;--frame-radius:23px}.site-wrap,.admin-wrap{margin-left:0;min-height:calc(100vh - 24px)}.sidebar,.admin .sidebar{width:260px;inset:12px auto 12px 12px;transform:translateX(calc(-100% - 30px));border-radius:23px;padding:30px 22px 22px}.nav-open .sidebar,.admin .sidebar.open{transform:translateX(0)}.nav-open .shade{backdrop-filter:blur(3px);background:#1d302666}.sidebar .brand span,.admin .sidebar .brand span{font-size:20px}.utility{height:82px;padding-left:22px;padding-right:70px}.utility .mobile-brand{display:flex}.mobile-toggle{top:35px;right:30px;border-radius:10px;width:36px;height:36px}.quiet-hero{min-height:620px}.quiet-hero h1{font-size:63px}.page-cover{min-height:400px}.cover-image{min-height:400px}.admin-top{height:74px;padding:18px 23px}.admin .mobile-admin{border-radius:8px;padding:7px 11px}.admin #admin-main{padding:28px 23px}.login-art{padding:40px}.login-art h1{font-size:39px}.login-art .brand{flex-direction:column;align-items:flex-start}.login-art .brand span{font-size:22px}.is-preview .mobile-toggle{top:68px}.is-preview .sidebar{top:45px}}
+@media(max-width:600px){:root{--frame-inset:10px;--frame-radius:21px}.site-wrap,.admin-wrap{min-height:calc(100vh - 20px)}.utility{height:78px;padding-left:18px}.mobile-brand img{width:45px;height:42px}.mobile-brand>span{font-size:14px}.mobile-brand small{font-size:7px}.mobile-toggle{right:25px;top:31px}.quiet-hero{margin:0 8px;border-radius:17px;min-height:580px;padding:58px 7% 100px}.quiet-hero h1{font-size:44px}.quiet-hero p{font-size:14px}.quiet-hero .hero-bottom{left:7%;right:7%;font-size:7px}.quiet-hero .image-caption{right:7%;font-size:7px}.section{padding:42px 7%}.home-introduction h2{font-size:32px}.home-introduction>div{gap:0;display:block}.home-introduction .kicker{font-size:7px}.explore-grid{margin:0 12px 12px;gap:12px}.explore-tile{min-height:290px;border-radius:17px;padding:25px}.explore-tile h2{font-size:32px}.tile-top{font-size:8px}.tile-action{font-size:11px}.responsibility-tile{min-height:240px}.page-cover{margin:0 8px;border-radius:17px;min-height:0}.cover-copy,.page-cover:not(.has-image) .cover-copy{padding:40px 7% 35px}.cover-copy h1{font-size:37px}.cover-copy .lead{font-size:14px}.cover-image{height:220px;min-height:220px}.page-heading{margin:0 8px;padding:40px 7% 32px;border-radius:17px}.page-heading h1{font-size:36px}.principles,.project-development,.product-collection{margin:0 8px 14px;border-radius:17px}.next-chapter{margin:0 8px 14px;border-radius:17px;padding:34px 7%}.next-chapter h2{font-size:29px}.principles h2{font-size:29px}.principles .identity-mark{width:85px;height:85px}.contact-layout{gap:28px}.contact-layout .panel{padding:23px 18px;border-radius:17px}.contact-layout .field-row{grid-template-columns:1fr}.partner-grid{gap:12px}.partner-grid a{min-height:135px}.responsibility-collection article{gap:18px}.responsibility-collection h2{font-size:26px}footer{margin:8px;border-radius:17px;padding:36px 7% 20px}.footer-top h2{font-size:28px}.footer-grid{gap:23px}.admin-top{padding:15px 16px;font-size:9px}.admin .avatar{width:28px;height:28px;font-size:9px;margin-right:5px}.admin #admin-main{padding:24px 14px}.admin-heading h1{font-size:25px}.admin .panel{padding:18px;border-radius:15px}.metric{padding:18px 14px;border-radius:15px}.metric label{font-size:9px}.metric strong{font-size:29px}.metric small{font-size:8px}.dashboard-grid{gap:18px;margin-bottom:18px}.admin .panel-title h2{font-size:16px}.admin-foot{padding:16px 14px}.media-tile{border-radius:13px}.admin .upload-box{padding:20px}.login-page{min-height:calc(100vh - 20px)}.login-art{min-height:285px;margin:8px;border-radius:17px;padding:28px}.login-art .brand{flex-direction:row;align-items:center;gap:15px;margin-bottom:30px}.login-art .brand span{font-size:19px}.login-art h1{font-size:34px}.login-form{padding:32px 25px}.consent{border-radius:14px}.is-preview .mobile-toggle{top:64px}}
+@media(max-height:780px){.sidebar .brand,.admin .sidebar .brand{margin-bottom:24px;gap:11px}.sidebar .brand img,.admin .sidebar .brand img{width:88px;height:78px}.sidebar .brand span,.admin .sidebar .brand span{font-size:18px}.sidebar nav a,.admin .sidebar nav a{min-height:38px;padding-top:11px;padding-bottom:11px}.sidebar .side-bottom{margin-top:24px}}

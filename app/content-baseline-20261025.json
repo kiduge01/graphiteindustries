@@ -1,0 +1,120 @@
+{
+    "settings": {
+        "company": "Graphite Industries Limited",
+        "email": "ce@graphiteindustries.co.tz",
+        "phone": "+255 713 283 711",
+        "address": "8th Floor, Morocco Squire, Mwai Kibaki Road, Kinondoni, Dar es Salaam, Tanzania",
+        "tagline": "Advancing Graphite. Creating Industrial Value."
+    },
+    "pages": [
+        {
+            "id": "home",
+            "title": "Advancing Graphite. Creating Industrial Value.",
+            "eyebrow": "TANZANIA · GRAPHITE & INDUSTRIAL VALUE",
+            "summary": "Developing a graphite processing and value-addition project in Mpwapwa, Dodoma, Tanzania.",
+            "body": "We aim to connect Tanzania’s mineral potential with industrial applications through appropriate processing technologies, responsible development and strategic partnerships.",
+            "image": "assets/graphite.jpg",
+            "seo": "Graphite Industries Limited | Graphite development in Tanzania",
+            "status": "published"
+        },
+        {
+            "id": "about",
+            "title": "A considered approach. A shared ambition.",
+            "eyebrow": "ABOUT GRAPHITE INDUSTRIES",
+            "summary": "A Tanzania-focused enterprise evaluating opportunities across graphite processing and industrial value addition.",
+            "body": "Our vision is to connect Tanzania’s mineral potential with industrial applications and market opportunities. We aim to establish a technically sound and responsibly managed project through systematic evaluation and collaboration.\n\nOur development strategy brings together feedstock verification, mineralogical characterisation, metallurgical testing and market assessment. Technical evidence and customer requirements will guide the scope of development.\n\nWe welcome experienced organisations that can contribute expertise, technology and long-term commercial insight.",
+            "image": "assets/people.jpg",
+            "seo": "About us | Graphite Industries Limited",
+            "status": "published"
+        },
+        {
+            "id": "project",
+            "title": "The Mpwapwa Project.",
+            "eyebrow": "OUR PROPOSED DEVELOPMENT",
+            "summary": "Evaluating an integrated graphite processing and value-addition project in Mpwapwa District, Dodoma Region.",
+            "body": "The project is at a development and planning stage. It is not an operating mine or commissioned processing facility.\n\nThe current project brief includes a planning ROM feed capacity of 2,000 tonnes per day. This is a preliminary, unvalidated assumption; final capacity and process configuration will depend on studies and investment decisions.\n\nFeedstock suitability, mineral rights, land tenure, water, electricity, logistics, environmental requirements and financing remain subject to verification and assessment.",
+            "image": "assets/logistics.jpg",
+            "seo": "Mpwapwa graphite project | Graphite Industries Limited",
+            "status": "published"
+        },
+        {
+            "id": "products",
+            "title": "From graphite to industrial possibility.",
+            "eyebrow": "PRODUCTS & APPLICATIONS",
+            "summary": "Potential product pathways shaped by feedstock characteristics, technical feasibility and customer requirements.",
+            "body": "Graphite concentrate, micronised graphite and expandable graphite are potential pathways for evaluation. No commercial product specifications, recoveries or production volumes are currently asserted.\n\nProduct development will require laboratory testing, appropriate process design and customer qualification. Any product offering will be defined through verified technical and commercial evidence.",
+            "image": "assets/graphite.jpg",
+            "seo": "Potential graphite products | Graphite Industries Limited",
+            "status": "published"
+        },
+        {
+            "id": "sustainability",
+            "title": "Responsible development starts with the decisions we make today.",
+            "eyebrow": "SUSTAINABILITY & GOVERNANCE",
+            "summary": "Environmental stewardship, inclusive participation and accountability are intended to guide project planning.",
+            "body": "Environmental priorities include water stewardship, energy efficiency, dust and noise controls, waste and tailings management, rehabilitation and biodiversity assessment.\n\nSocial priorities include worker safety, community engagement, local employment, skills development and gender inclusion.\n\nGovernance priorities include accountability, ethical conduct, regulatory compliance, procurement integrity and risk management. Specific targets and performance reporting will be developed when verified baselines and monitoring systems are available.",
+            "image": "assets/people.jpg",
+            "seo": "Sustainability | Graphite Industries Limited",
+            "status": "published"
+        },
+        {
+            "id": "investors",
+            "title": "Build the next chapter with us.",
+            "eyebrow": "INVESTORS & STRATEGIC PARTNERS",
+            "summary": "We welcome preliminary discussions with organisations that can contribute to project evaluation and development.",
+            "body": "Engagement opportunities include geological services, laboratories, metallurgical testing, process engineering, technology provision, infrastructure, logistics, industrial buying and strategic investment.\n\nEngagement begins with a non-confidential introduction, followed by scope definition and appropriate due diligence. Any cooperation is subject to mutually agreed terms, applicable approvals and internal authorisation.\n\nThe corporate project brief is an introductory draft. It is not an offer to invest, a feasibility study or a mineral resource or reserve statement.",
+            "image": "assets/port.jpg",
+            "seo": "Investors and partners | Graphite Industries Limited",
+            "status": "published"
+        },
+        {
+            "id": "contact",
+            "title": "Let’s start a conversation.",
+            "eyebrow": "CONTACT & ENQUIRIES",
+            "summary": "Tell us about your organisation, your capabilities and how you would like to engage.",
+            "body": "Please share non-confidential information only. Our team will review your enquiry and respond using the contact details you provide.",
+            "image": "",
+            "seo": "Contact | Graphite Industries Limited",
+            "status": "published"
+        }
+    ],
+    "posts": [],
+    "media": [
+        {
+            "id": 1,
+            "name": "Graphite mineral",
+            "url": "assets/graphite.jpg",
+            "type": "image/jpeg"
+        },
+        {
+            "id": 2,
+            "name": "Corporate project brief — draft",
+            "url": "assets/corporate-project-brief-draft.pdf",
+            "type": "application/pdf"
+        },
+        {
+            "id": 3,
+            "name": "Logistics illustration",
+            "url": "assets/logistics.jpg",
+            "type": "image/jpeg"
+        },
+        {
+            "id": 4,
+            "name": "People illustration",
+            "url": "assets/people.jpg",
+            "type": "image/jpeg"
+        }
+    ],
+    "legal": {
+        "privacy": {
+            "title": "Privacy notice.",
+            "summary": "How this website handles enquiries and optional visitor measurement.",
+            "body": "Information you choose to share\n\nOur enquiry form collects your name, email, organisation, enquiry category and message to review and respond to your request. Do not submit sensitive or confidential information.\n\nWebsite measurement\n\nOptional first-party analytics record page visits, referring hostnames and document clicks after you accept analytics. A random session identifier is used to count visits; the application does not store IP addresses or infer your country. Your preference is saved in this browser.\n\nAccess and questions\n\nContact ce@graphiteindustries.co.tz to ask about your enquiry information or request correction or deletion. Information is accessible to authorised staff. The company must confirm its retention schedule and applicable privacy arrangements before public launch."
+        },
+        "terms": {
+            "title": "Website terms.",
+            "summary": "Information about preliminary project materials and use of this website.",
+            "body": "Preliminary project information\n\nThis website introduces a proposed development. Information does not constitute an offer to invest, a resource or reserve statement, or a guarantee of project performance. Planning figures are subject to verification and change.\n\nIllustrations and documents\n\nSupporting imagery is illustrative unless expressly identified otherwise. Documents marked draft remain preliminary. Enquiries do not create a contractual commitment.\n\nContact\n\nQuestions about this website may be directed to ce@graphiteindustries.co.tz."
+        }
+    }
+}

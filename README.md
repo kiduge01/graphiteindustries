@@ -156,4 +156,24 @@ offsite backup destination on the final host. Sessions use private
 
 ## Before public launch
 
+### Reviewed website content (26 October 2026)
+
+The revised presentation and content/source map are described in
+[CONTENT-MAP.md](CONTENT-MAP.md). On an existing installation, first take a
+backup, then run `php bin/improve-content.php` to review eligible content changes.
+Run `php bin/improve-content.php --apply` to save them. This updates only fields
+that still match the retained baseline, preserves custom edits and publication
+status, and records previous pages in CMS revision history. Repeated runs are
+safe. Read reported conflicts before manually merging any custom content.
+
+Page body text supports `## Section heading`, `### Subheading`, `- Bullet` and
+`1. Numbered step`, with blank lines between paragraphs or lists. HTML remains
+escaped. Essential content is also rendered by PHP. The public refinements are
+in `public/assets/improvements.css`; the existing administration styling remains
+separate. Product enquiry details are optional and stored with the message in
+the existing CMS inbox. Email notifications remain deferred.
+
+Draft project-brief promotion has been replaced with a request for suitable
+information until public distribution and a dated revision are approved.
+
 Confirm company contacts/address, final privacy/terms and image permissions; approve draft project content; install on PHP/MySQL hosting; run the end-to-end enquiry and publishing checks; configure backups/cron and verify restoration. No operating mine, reserves, approvals, confirmed product grades, customers or funding commitments are asserted.

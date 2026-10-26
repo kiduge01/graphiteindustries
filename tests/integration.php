@@ -56,6 +56,24 @@ try {
     command(['bin/install.php'], $environment);
     command(['bin/migrate.php'], $environment);
     $pdo = new PDO($config['dsn'], $config['db_user'], $config['db_password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $baseline = json_decode(file_get_contents($root . '/app/content-baseline-20261025.json'), true);
+    $baselinePages = array_column($baseline['pages'], null, 'id');
+    $reviewed = json_decode(file_get_contents($root . '/app/seed.json'), true);
+    $reviewedPages = array_column($reviewed['pages'], null, 'id');
+    $pdo->prepare('UPDATE pages SET title=?,summary=? WHERE id=?')->execute(['Owner-edited title', $baselinePages['about']['summary'], 'about']);
+    $pdo->prepare('UPDATE pages SET body=?,status=? WHERE id=?')->execute([$baselinePages['project']['body'], 'draft', 'project']);
+    command(['bin/improve-content.php'], $environment);
+    check($pdo->query("SELECT summary FROM pages WHERE id='about'")->fetchColumn() === $baselinePages['about']['summary'], 'Content update review makes no changes');
+    command(['bin/improve-content.php', '--apply'], $environment);
+    $updatedAbout = $pdo->query("SELECT * FROM pages WHERE id='about'")->fetch(PDO::FETCH_ASSOC);
+    check($updatedAbout['title'] === 'Owner-edited title' && $updatedAbout['summary'] === $reviewedPages['about']['summary'], 'Update preserves owner edits while upgrading untouched fields');
+    check($pdo->query("SELECT status FROM pages WHERE id='project'")->fetchColumn() === 'draft', 'Content update preserves publication status');
+    check($pdo->query("SELECT body FROM pages WHERE id='project'")->fetchColumn() === $reviewedPages['project']['body'], 'Baseline project content is upgraded');
+    $revisionCount = (int)$pdo->query('SELECT COUNT(*) FROM revisions')->fetchColumn();
+    check($revisionCount === 2, 'Content update records previous pages in revision history');
+    command(['bin/improve-content.php', '--apply'], $environment);
+    check((int)$pdo->query('SELECT COUNT(*) FROM revisions')->fetchColumn() === $revisionCount, 'Content update is idempotent');
+    $pdo->exec("UPDATE pages SET status='published' WHERE id='project'");
     $insert = $pdo->prepare('INSERT INTO users (name,email,password_hash,role,created_at) VALUES (?,?,?,?,?)');
     $insert->execute(['Test Admin', 'admin@example.test', password_hash('fixture-admin-password', PASSWORD_DEFAULT), 'admin', gmdate('Y-m-d H:i:s')]);
     $adminId = (int)$pdo->lastInsertId();
@@ -75,7 +93,7 @@ try {
         if ($data !== null) {
             $headers[] = 'Content-Type: application/json';
         }
-        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_COOKIEJAR => $cookie, CURLOPT_COOKIEFILE => $cookie, CURLOPT_HTTPHEADER => $headers, CURLOPT_TIMEOUT => 10]);
+        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_COOKIEJAR => $cookie, CURLOPT_COOKIEFILE => $cookie, CURLOPT_HTTPHEADER => $headers, CURLOPT_TIMEOUT => 30]);
         if ($data !== null || $multipart !== null) {
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $multipart ?? json_encode($data));
@@ -112,6 +130,12 @@ try {
     $api('login', ['email' => 'admin@example.test', 'password' => 'fixture-admin-password']);
     $public = $api('public');
     check(count($public['pages']) === 7, 'Seeded published pages');
+    $homeHtml = $request('/index.php')['body'];
+    check(substr_count($homeHtml, '<section ') === 3 && str_contains($homeHtml, 'Discover Mpwapwa'), 'Original homepage is rendered by the server');
+    $projectHtml = $request('/index.php?page=project')['body'];
+    check(str_contains($projectHtml, 'process-chain') && str_contains($projectHtml, 'development-roadmap'), 'Processing chain and roadmap are separately rendered without JavaScript');
+    $productsHtml = $request('/index.php?page=products')['body'];
+    check(str_contains($productsHtml, '<h3>Energy Storage</h3>') && str_contains($productsHtml, '<h3>Friction Materials</h3>'), 'Applications are readable without JavaScript');
     $page = array_values(array_filter($public['pages'], fn($p) => $p['id'] === 'about'))[0];
     $api('savePage', array_merge($page, ['status' => 'draft']));
     $request('/index.php?page=about', null, 404);

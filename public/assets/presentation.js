@@ -1,25 +1,39 @@
 'use strict';
 
-// Presentation uses the published CMS content; no project milestones are inferred.
+// CMS text supports headings and lists; arbitrary HTML is always escaped.
+function contentSections(body) {
+  const sections = [{ title: '', body: '' }];
+  for (const line of String(body || '').split('\n')) {
+    if (line.startsWith('## ')) sections.push({ title: line.slice(3).trim(), body: '' });
+    else sections[sections.length - 1].body += line + '\n';
+  }
+  return sections.filter(s => s.title || s.body.trim());
+}
+function readableText(body, listClass = '') {
+  return String(body || '').trim().split(/\n\s*\n/).filter(Boolean).map(block => {
+    const lines = block.split('\n');
+    if (lines.every(x => /^\d+\. /.test(x))) return `<ol class="${listClass || 'copy-list'}">${lines.map(x => {
+      const text = x.replace(/^\d+\. /, ''), cut = text.indexOf(' — ');
+      return `<li>${cut < 0 ? esc(text) : `<h3>${esc(text.slice(0, cut))}</h3><p>${esc(text.slice(cut + 3))}</p>`}</li>`;
+    }).join('')}</ol>`;
+    if (lines.every(x => x.startsWith('- '))) return `<ul class="copy-list">${lines.map(x => `<li>${esc(x.slice(2))}</li>`).join('')}</ul>`;
+    return `<p>${lines.map(esc).join('<br>')}</p>`;
+  }).join('');
+}
+function subsections(body) {
+  return String(body).split(/^### /m).map((part, i) => {
+    if (!i) return { title: '', body: part };
+    const cut = part.indexOf('\n');
+    return { title: part.slice(0, cut).trim(), body: part.slice(cut + 1) };
+  });
+}
 function pageCover(p, id) {
-  return `<section class="page-cover cover-${esc(id)} ${p.image ? 'has-image' : ''}">
-    <div class="cover-copy"><span class="kicker">${esc(p.eyebrow)}</span><h1>${esc(p.title)}</h1><p class="lead">${esc(p.summary)}</p></div>
-    ${p.image ? `<figure class="cover-image"><img src="${esc(safeURL(p.image))}" alt="${id === 'products' ? 'Graphite mineral texture' : 'Illustrative image from company materials'}" fetchpriority="high"><figcaption>Illustrative imagery</figcaption></figure>` : ''}
-  </section>`;
+  const image = safeURL(p.image);
+  return `<section class="page-cover cover-${esc(id)} ${image ? 'has-image' : ''}"><div class="cover-copy"><a class="breadcrumb" href="?page=home">Home <span aria-hidden="true">/</span></a><span class="kicker">${esc(p.eyebrow)}</span><h1>${esc(p.title)}</h1><p class="lead">${esc(p.summary)}</p></div>${image ? `<figure class="cover-image"><img src="${esc(image)}" alt="${image.includes('graphite') ? 'Close view of a graphite mineral specimen' : 'Representative industrial context, not the Mpwapwa site'}" width="1000" height="750" fetchpriority="high"><figcaption>${image.includes('graphite') ? 'Graphite mineral · illustrative' : 'Illustrative imagery · not the project site'}</figcaption></figure>` : ''}</section>`;
 }
-
-function contentBlocks(body) {
-  return String(body || '').split(/\n\s*\n/).filter(x => x.trim());
-}
-
-function editorialCopy(p, label = 'OVERVIEW') {
-  return `<section class="section editorial-copy"><span class="kicker">${label}</span><div>${paragraphs(p.body)}</div></section>`;
-}
-
 function nextChapter(id, eyebrow, title, text) {
-  return `<section class="next-chapter"><div><span class="kicker">${eyebrow}</span><h2>${title}</h2></div>${link(id, text, 'chapter-link')}</section>`;
+  return `<section class="next-chapter"><div><span class="kicker">${esc(eyebrow)}</span><h2>${esc(title)}</h2></div>${link(id, esc(text), 'chapter-link')}</section>`;
 }
-
 function homePage(p) {
   return `<section class="hero quiet-hero"><div class="hero-image" style="background-image:url('${esc(safeURL(p.image))}')"></div><div class="hero-content"><span class="kicker">TANZANIA / GRAPHITE INDUSTRIES LIMITED</span><div class="green-rule"></div><h1>${esc(p.title)}</h1><p>${esc(p.summary)}</p>${link('project', 'Discover Mpwapwa', 'btn green')}</div><span class="image-caption">Illustrative graphite imagery</span><div class="hero-bottom">MPWAPWA, DODOMA <span>EVALUATION & PLANNING</span></div></section>
   <section class="section home-introduction"><span class="kicker">MINERAL POTENTIAL. INDUSTRIAL AMBITION.</span><div><h2>A new chapter<br>for graphite in Tanzania.</h2>${link('about', 'Meet Graphite Industries')}</div></section>
@@ -31,33 +45,46 @@ function homePage(p) {
 }
 
 function editorialPage(p, id, q) {
+  if (id === 'about') return aboutSampleA();
   let html = pageCover(p, id);
-  if (id === 'about') {
-    html += editorialCopy(p, 'WHO WE ARE');
-    html += `<section class="section principles"><div class="section-head"><div><span class="kicker">WHAT GUIDES US</span><h2>Conviction.<br>With discipline.</h2></div><img class="identity-mark" src="assets/logo.png" alt="Graphite Industries Limited" loading="lazy"></div><div class="principle-list">${[['01', 'Evidence first', 'Technical evaluation guides development decisions.'], ['02', 'Industrial relevance', 'Customer requirements shape potential products.'], ['03', 'Responsible progress', 'People, place and accountability inform our approach.']].map(x => `<article><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('')}</div></section>`;
-    html += nextChapter('project', 'EXPLORE THE AMBITION', 'The Mpwapwa project.', 'View the project');
-  } else if (id === 'project') {
-    html += editorialCopy(p, 'PROJECT OVERVIEW');
-    html += `<section class="section project-development"><div class="section-head"><div><span class="kicker">THE WAY FORWARD</span><h2>Progress through evidence.</h2></div><span class="stage-label">PROPOSED WORKSTREAMS</span></div><div class="development-list">${stages.map((s, i) => `<details ${i === 0 ? 'open' : ''}><summary><span>${s[0]}</span><h3>${s[1]}</h3><span class="detail-toggle" aria-hidden="true"></span></summary><p>${s[2]}</p></details>`).join('')}</div><p class="fine">Proposed workstreams, not completed milestones or a committed schedule.</p></section>`;
-    html += `<section class="section brief compact-brief"><div><span class="kicker">PROJECT DOCUMENT</span><h2>The detail, in one place.</h2><small>Development-stage draft PDF &middot; Not an offer to invest</small></div><a class="btn green download" href="assets/corporate-project-brief-draft.pdf" target="_blank" rel="noopener">Read project brief <span aria-hidden="true">&darr;</span></a></section>`;
-    html += nextChapter('products', 'FROM MINERAL TO MATERIAL', 'Explore the possibilities.', 'Potential products');
-  } else if (id === 'products') {
-    html += editorialCopy(p, 'PRODUCT DEVELOPMENT');
-    html += `<section class="section product-collection"><span class="kicker">THREE PATHWAYS UNDER EVALUATION</span>${products()}</section>`;
-    html += nextChapter('contact', 'FOR INDUSTRIAL BUYERS', 'Start with your requirements.', 'Discuss an application');
-  } else if (id === 'sustainability') {
-    const blocks = contentBlocks(p.body);
-    const labels = [['01', 'Environment'], ['02', 'People & communities'], ['03', 'Governance']];
-    html += `<section class="section responsibility-collection">${blocks.map((body, i) => `<article><span class="responsibility-number">${labels[i]?.[0] || String(i + 1).padStart(2, '0')}</span><div><h2>${labels[i]?.[1] || 'Our approach'}</h2>${paragraphs(body)}</div></article>`).join('')}</section>`;
-    html += nextChapter('project', 'RESPONSIBILITY IN CONTEXT', 'Considered from the start.', 'Explore the project');
-  } else if (id === 'investors') {
-    const blocks = contentBlocks(p.body);
-    html += `<section class="section partnership-collection"><div class="section-head"><div><span class="kicker">OPPORTUNITIES TO CONNECT</span><h2>Expertise meets ambition.</h2></div></div><div class="partner-grid">${[['Geology & testing', 'Geology & laboratory services'], ['Engineering & technology', 'Technology & engineering'], ['Industrial buyers', 'Product information'], ['Infrastructure & logistics', 'Infrastructure & logistics'], ['Strategic investment', 'Investment & partnership'], ['Environment & communities', 'Environmental & social services']].map((x, i) => `<a href="?page=contact&category=${encodeURIComponent(x[1])}"><span>0${i + 1}</span><h3>${x[0]}</h3><b aria-hidden="true">&nearr;</b></a>`).join('')}</div><details class="engagement-details"><summary>How engagement works <span aria-hidden="true">+</span></summary>${paragraphs(blocks.slice(1).join('\n\n'))}</details><details class="engagement-details"><summary>Areas of collaboration <span aria-hidden="true">+</span></summary>${paragraphs(blocks[0] || '')}</details></section>`;
-    html += `<section class="section brief compact-brief"><div><span class="kicker">BEFORE WE TALK</span><h2>Get to know the project.</h2><small>Introductory draft &middot; Not an offer to invest</small></div><a class="btn green download" href="assets/corporate-project-brief-draft.pdf" target="_blank" rel="noopener">Read the project brief <span aria-hidden="true">&darr;</span></a></section>`;
-  } else if (id === 'contact') {
-    html += contactForm(q.get('category'));
-  } else {
-    html += editorialCopy(p);
-  }
+  if (id === 'contact') return html + contactForm(q.get('category'));
+  let inPurpose = false;
+  let introduction = '';
+  contentSections(p.body).forEach((s, i) => {
+    if (!s.title) {
+      if (id === 'about') html += `<section class="section page-introduction"><span class="kicker">OUR APPROACH</span><div>${readableText(s.body)}</div></section>`;
+      else introduction = s.body;
+      return;
+    }
+    const purpose = id === 'about' && ['Our vision', 'Our mission'].includes(s.title);
+    if (purpose && !inPurpose) { html += '<div class="purpose-grid">'; inPurpose = true; }
+    if (!purpose && inPurpose) { html += '</div>'; inPurpose = false; }
+    const process = id === 'project' && s.title === 'From feedstock to finished material';
+    const roadmap = id === 'project' && s.title === 'A development roadmap';
+    const applications = id === 'products' && s.title === 'Where graphite can make a difference';
+    const partners = id === 'investors' && s.title === 'Contributions we seek';
+    const product = id === 'products' && ['Graphite concentrate', 'Micronised graphite', 'Expandable graphite'].includes(s.title);
+    const classes = ['section', 'editorial-section', purpose ? 'purpose-section' : '', process ? 'process-section' : '', roadmap ? 'roadmap-section' : '', applications ? 'applications-section' : '', partners ? 'partners-section' : '', product ? 'product-pathway' : '', id === 'sustainability' ? 'esg-section' : ''].filter(Boolean).join(' ');
+    html += `<section class="${classes}"><div class="editorial-heading"><span class="section-number">${String(i).padStart(2, '0')}</span><h2>${esc(s.title)}</h2>${product ? '<span class="status-label">Proposed pathway · under evaluation</span>' : ''}</div><div class="editorial-body">`;
+    if (introduction) { html += readableText(introduction); introduction = ''; }
+    if (applications || partners) {
+      const parts = subsections(s.body), categories = ['Investment', 'Technology & Engineering', 'Technology & Engineering', 'Supply & Logistics', 'Products', 'Supply & Logistics'];
+      html += readableText(parts[0].body);
+      html += `<div class="${partners ? 'partner-grid' : 'application-grid'}">${parts.slice(1).map((part, n) => partners ? `<a href="?page=contact&category=${encodeURIComponent(categories[n] || 'General')}"><span>0${n + 1}</span><h3>${esc(part.title)}</h3>${readableText(part.body)}<span class="partner-action">Discuss this area <b aria-hidden="true">↗</b></span></a>` : `<article><span class="application-icon" aria-hidden="true">${['↯', '◈', '≈', '◎'][n]}</span><h3>${esc(part.title)}</h3>${readableText(part.body)}</article>`).join('')}</div>`;
+      if (applications) html += '<p class="source-note">Industry context: <a href="https://www.usgs.gov/centers/national-minerals-information-center/graphite-statistics-and-information" target="_blank" rel="noopener">USGS graphite information ↗</a>. Applications are subject to product and customer qualification.</p>';
+    } else html += readableText(s.body, process ? 'process-chain' : roadmap ? 'development-roadmap' : id === 'investors' ? 'engagement-steps' : '');
+    if (product && s.title === 'Expandable graphite') html += '<p class="source-note">Industry context: <a href="https://www.luh.de/en/expandable-graphite/" target="_blank" rel="noopener">Georg H. LUH on expandable graphite ↗</a>.</p>';
+    html += '</div></section>';
+  });
+  if (introduction) html += `<section class="section"><div class="editorial-body">${readableText(introduction)}</div></section>`;
+  if (inPurpose) html += '</div>';
+  const next = {
+    about: ['project', 'SEE THE IDEA IN CONTEXT', 'Explore the proposed Mpwapwa project.', 'Our Project'],
+    project: ['products', 'FROM PROCESS TO PURPOSE', 'What could graphite become?', 'Products & Applications'],
+    products: ['contact&category=Products', 'FOR INDUSTRIAL BUYERS', 'Tell us what your application needs.', 'Discuss your requirements'],
+    investors: ['contact&category=Investment', 'A PLACE TO BEGIN', 'Bring your experience to the conversation.', 'Introduce your organisation'],
+    sustainability: ['contact', 'QUESTIONS & PERSPECTIVES', 'Responsible progress takes dialogue.', 'Contact our team'],
+  };
+  if (next[id]) html += nextChapter(...next[id]);
   return html;
 }

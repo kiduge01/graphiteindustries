@@ -21,5 +21,29 @@ function html_escape(string $text): string
 }
 function body_paragraphs(string $body): string
 {
-    return implode('', array_map(fn($p) => '<p>' . nl2br(html_escape($p)) . '</p>', preg_split('/\n\s*\n/', $body)));
+    $html = '';
+    foreach (preg_split('/\n\s*\n/', trim($body)) as $block) {
+        $lines = explode("\n", $block);
+        if (preg_match('/^(#{2,3}) (.+)$/', $lines[0], $heading)) {
+            $tag = strlen($heading[1]) === 2 ? 'h2' : 'h3';
+            $html .= '<' . $tag . '>' . html_escape($heading[2]) . '</' . $tag . '>';
+            array_shift($lines);
+            if (!$lines) continue;
+            $block = implode("\n", $lines);
+        }
+        if (count(array_filter($lines, fn($line) => str_starts_with($line, '- '))) === count($lines)) {
+            $html .= '<ul class="copy-list">' . implode('', array_map(fn($line) => '<li>' . html_escape(substr($line, 2)) . '</li>', $lines)) . '</ul>';
+        } elseif (count(array_filter($lines, fn($line) => preg_match('/^\d+\. /', $line))) === count($lines)) {
+            $html .= '<ol class="copy-list">';
+            foreach ($lines as $line) {
+                $text = preg_replace('/^\d+\. /', '', $line);
+                $parts = explode(' — ', $text, 2);
+                $html .= '<li>' . (count($parts) === 2 ? '<h3>' . html_escape($parts[0]) . '</h3><p>' . html_escape($parts[1]) . '</p>' : html_escape($text)) . '</li>';
+            }
+            $html .= '</ol>';
+        } else {
+            $html .= '<p>' . nl2br(html_escape($block)) . '</p>';
+        }
+    }
+    return $html;
 }

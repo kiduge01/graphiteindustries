@@ -4,9 +4,13 @@ $template = file_get_contents(__DIR__ . '/index.html');
 try {
     require __DIR__ . '/../app/bootstrap.php';
     require ROOT . '/app/public-content.php';
+    require ROOT . '/app/public-presentation.php';
     security_headers();
     header('Content-Type: text/html; charset=utf-8');
     $id = $_GET['page'] ?? 'home';
+    if ($id !== 'home') {
+        $template = str_replace('media="not all"', 'media="all"', $template);
+    }
     if (!is_string($id) || !preg_match('/^[a-z][a-z0-9-]{0,39}$/', $id)) {
         $id = '__invalid';
     }
@@ -66,10 +70,16 @@ try {
     $template = preg_replace_callback('~<title>.*?</title>~s', fn() => '<title>' . html_escape($title) . '</title>', $template);
     $template = preg_replace_callback('~<meta name="description"[^>]*>~', fn() => '<meta name="description" content="' . html_escape($page['summary']) . '">', $template);
     $article = '<article class="section article-copy"><h1>' . html_escape($page['title']) . '</h1><p class="lead">' . html_escape($page['summary']) . '</p>' . body_paragraphs($page['body']) . $extra . '</article>';
+    if ($id === 'home' && http_response_code() !== 404) {
+        $article = server_home($page);
+    } elseif (in_array($id, ['about', 'project', 'products', 'investors', 'sustainability', 'contact'], true) && http_response_code() !== 404) {
+        $article = server_editorial($page, $id, $settings);
+    }
     $template = str_replace('<main id="main" tabindex="-1"></main>', '<main id="main" tabindex="-1">' . $article . '</main>', $template);
     $navigation = '';
+    $labels = ['home' => 'Home', 'about' => 'About Us', 'project' => 'Our Project', 'products' => 'Products & Applications', 'sustainability' => 'Sustainability', 'investors' => 'Investors & Partners', 'contact' => 'Contact Us'];
     foreach ($pages as $item) {
-        $navigation .= '<a href="?page=' . html_escape($item['id']) . '">' . html_escape(ucfirst($item['id'])) . '</a>';
+        $navigation .= '<a' . ($item['id'] === $id ? ' class="active" aria-current="page"' : '') . ' href="?page=' . html_escape($item['id']) . '">' . html_escape($labels[$item['id']] ?? ucfirst($item['id'])) . '</a>';
     }
     $navigation .= '<a href="?page=news">News &amp; Updates</a><a href="?page=privacy">Privacy notice</a><a href="?page=terms">Website terms</a>';
     $template = str_replace('<nav id="site-nav" aria-label="Main navigation"></nav>', '<nav id="site-nav" aria-label="Main navigation">' . $navigation . '</nav>', $template);

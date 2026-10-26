@@ -1,0 +1,5 @@
+/* Shared navigation behaviour is retained for both the original homepage and
+   the revised inner pages. Visual refinements are loaded only on inner pages. */
+.nav-close{display:none}.nav-open{overflow:hidden}
+.no-js .mobile-toggle{display:none}.no-js .sidebar{transform:none;position:relative;inset:auto;width:auto;margin-bottom:16px}.no-js .sidebar .brand{margin-bottom:20px}.no-js .sidebar nav{display:flex;flex-wrap:wrap;gap:10px}.no-js .sidebar .nav-label,.no-js .sidebar .side-bottom{display:none}.no-js .site-wrap{margin-left:0}
+@media(max-width:850px){.nav-open .nav-close{display:block;position:absolute;right:16px;top:14px;width:36px;height:36px;background:white;border:1px solid #bdc8c0;border-radius:5px;color:#174a3a;font-size:22px;z-index:1}}

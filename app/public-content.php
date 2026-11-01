@@ -15,6 +15,59 @@ function public_url(string $query = ''): string
     global $config;
     return rtrim($config['base_url'], '/') . '/' . ($query !== '' ? '?' . $query : '');
 }
+// Absolute clean route: base/ for home, base/about, base/news?post=3.
+function page_url(string $id, array $params = []): string
+{
+    global $config;
+    $path = $id === 'home' ? '' : rawurlencode($id);
+    return rtrim($config['base_url'], '/') . '/' . $path . ($params ? '?' . http_build_query($params) : '');
+}
+function asset_url(string $path): string
+{
+    global $config;
+    return preg_match('~^https://~', $path) ? $path : rtrim($config['base_url'], '/') . '/' . ltrim($path, '/');
+}
+// Open Graph, Twitter card and Organization structured data for one page.
+function social_meta(array $page, array $settings, string $title, string $canonical): string
+{
+    $company = $settings['company'] ?? 'Graphite Industries Limited';
+    $image = $page['image'] ?? '';
+    // Social networks need JPEG/PNG and a landscape share image works best everywhere.
+    $image = preg_match('~^(assets|uploads)/[a-zA-Z0-9._/-]+\.(jpe?g|png)$~', $image) ? $image : 'assets/og-image.jpg';
+    $tags = [
+        'og:type' => isset($page['published_at']) ? 'article' : 'website',
+        'og:site_name' => $company,
+        'og:title' => $title,
+        'og:description' => $page['summary'] ?? '',
+        'og:url' => $canonical,
+        'og:image' => asset_url($image),
+        'og:locale' => 'en_GB',
+    ];
+    $html = '';
+    foreach ($tags as $property => $content) {
+        $html .= '<meta property="' . $property . '" content="' . html_escape($content) . '">';
+    }
+    if ($image === 'assets/og-image.jpg') {
+        $html .= '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">';
+    }
+    $html .= '<meta property="og:image:alt" content="' . html_escape($company) . '">';
+    $html .= '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' . html_escape($title) . '"><meta name="twitter:description" content="' . html_escape($page['summary'] ?? '') . '"><meta name="twitter:image" content="' . html_escape(asset_url($image)) . '">';
+    $sameAs = array_values(array_filter(array_map(fn($key) => $settings[$key] ?? '', ['linkedin', 'x', 'facebook', 'instagram', 'youtube']), fn($url) => preg_match('~^https://[^\s"\'<>]+$~', $url)));
+    $organization = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $company,
+        'url' => page_url('home'),
+        'logo' => asset_url('assets/logo-512.png'),
+        'email' => $settings['email'] ?? '',
+        'telephone' => $settings['phone'] ?? '',
+        'slogan' => $settings['tagline'] ?? '',
+        'address' => ($settings['address'] ?? '') !== '' ? ['@type' => 'PostalAddress', 'streetAddress' => $settings['address'], 'addressCountry' => 'TZ'] : null,
+        'sameAs' => $sameAs ?: null,
+    ]);
+    $json = json_encode($organization, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+    return $html . '<script type="application/ld+json">' . $json . '</script>';
+}
 function html_escape(string $text): string
 {
     return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

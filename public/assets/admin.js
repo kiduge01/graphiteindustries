@@ -1,5 +1,17 @@
 'use strict';
 let user, state, tab = 'overview';
+// Company settings; optional values stay hidden on the public website until filled.
+const settingFields = [
+  ['company', 'Company name', 'text', true], ['email', 'Public email', 'email', true], ['phone', 'Phone', 'text', true],
+  ['address', 'Office address', 'text', true], ['tagline', 'Tagline', 'text', true],
+  ['registration', 'Registration details', 'text', false, 'Shown in the footer, e.g. "Company registration no. 123456789 · TIN 123-456-789".'],
+  ['office_hours', 'Office hours', 'text', false, 'For example "Monday to Friday, 08:30–17:00 EAT".'],
+  ['map_url', 'Map link', 'url', false, 'Optional https:// map link for the office. A map search for the address is used when blank.'],
+  ['company_profile', 'Company profile PDF', 'text', false, 'Path of an approved PDF from the media library, e.g. uploads/abc123.pdf. Shown on Investors & Partners.'],
+  ['linkedin', 'LinkedIn page', 'url', false], ['x', 'X (Twitter) profile', 'url', false], ['facebook', 'Facebook page', 'url', false],
+  ['instagram', 'Instagram profile', 'url', false], ['youtube', 'YouTube channel', 'url', false],
+  ['notify_email', 'Enquiry notification email', 'email', false, 'Receives new-enquiry notifications when email delivery is configured on the server. Not shown publicly.'],
+];
 const sections = [['overview', '◫', 'Overview'], ['pages', '▤', 'Pages'], ['posts', '▧', 'News & Updates'], ['media', '▨', 'Media Library'], ['enquiries', '✉', 'Enquiries'], ['analytics', '▥', 'Analytics'], ['users', '♧', 'Users & Roles'], ['settings', '⚙', 'Settings']];
 const status = s => `<span class="badge ${esc(s)}">${esc(s)}</span>`;
 function openModal(html) {
@@ -20,7 +32,7 @@ async function start() {
   }
 }
 function login() {
-  $('#admin-root').innerHTML = `<div class="login-page"><div class="login-art"><a class="brand" href="index.php"><img src="assets/logo.png" alt="Company logo"><span>GRAPHITE<small>INDUSTRIES LIMITED</small></span></a><div><span class="kicker">WEBSITE MANAGEMENT</span><h1>A clear view.<br>A confident next step.</h1><p>Manage your company’s story, content and conversations.</p></div><small>Graphite Industries Limited</small></div><form class="login-form" id="login-form"><span class="kicker">YOUR PUBLISHING WORKSPACE</span><h2>Welcome back.</h2><p class="muted">Sign in to manage the website.</p>${DEMO ? '<div class="demo-notice">DESIGN PREVIEW · Browser-local content only. No real accounts, messages or visitor statistics.</div>' : '<label>Email address<input type="email" name="email" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label>'}<button class="btn green">${DEMO ? 'Enter demo dashboard ↗' : 'Sign in ↗'}</button><p class="error" id="login-error" role="alert"></p><p class="fine">${DEMO ? 'Edits in this preview stay in this browser.' : 'Access is restricted to authorised company staff.'}</p><a class="text-link" href="${DEMO ? 'index.html' : 'index.php'}">← Back to website</a></form></div>`;
+  $('#admin-root').innerHTML = `<div class="login-page"><div class="login-art"><a class="brand" href="index.php"><img src="assets/logo-224.png" alt="Company logo"><span>GRAPHITE<small>INDUSTRIES LIMITED</small></span></a><div><span class="kicker">WEBSITE MANAGEMENT</span><h1>A clear view.<br>A confident next step.</h1><p>Manage your company’s story, content and conversations.</p></div><small>Graphite Industries Limited</small></div><form class="login-form" id="login-form"><span class="kicker">YOUR PUBLISHING WORKSPACE</span><h2>Welcome back.</h2><p class="muted">Sign in to manage the website.</p><label>Email address<input type="email" name="email" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="btn green">Sign in ↗</button><p class="error" id="login-error" role="alert"></p><p class="fine">Access is restricted to authorised company staff.</p><a class="text-link" href="index.php">← Back to website</a></form></div>`;
   $('#login-form').onsubmit = async e => {
     e.preventDefault();
     const b = $('button', e.target);
@@ -42,7 +54,7 @@ async function load() {
 }
 function shell() {
   let nav = sections.filter(s => user.role === 'admin' || !['users', 'settings'].includes(s[0]));
-  $('#admin-root').innerHTML = `<aside class="sidebar"><a class="brand" href="${DEMO ? 'index.html' : 'index.php'}"><img src="assets/logo.png" alt="Company logo"><span>GRAPHITE<small>INDUSTRIES LIMITED</small></span></a><div class="nav-label">CONTENT & MANAGEMENT</div><nav aria-label="Admin navigation">${nav.map(s => `<a href="#${s[0]}" data-tab="${s[0]}"><div><i>${s[1]}</i>${s[2]}</div><span>${s[0] === 'enquiries' ? (state.stats.new_enquiries ?? state.enquiries.filter(e => e.status === 'new').length) : ''}</span></a>`).join('')}</nav><div class="side-bottom"><a href="${DEMO ? 'index.html' : 'index.php'}" target="_blank">View website ↗</a><button id="logout">Sign out</button></div></aside><div class="admin-wrap"><header class="admin-top"><span>Workspace / <b id="breadcrumb">Overview</b></span><button class="mobile-admin">☰ Menu</button><span><span class="avatar">${esc(user.name.slice(0, 2).toUpperCase())}</span>${esc(user.name)} · ${esc(user.role)}</span></header><main id="admin-main"></main><footer class="admin-foot">GRAPHITE INDUSTRIES LIMITED <span>Website management workspace</span></footer></div>`;
+  $('#admin-root').innerHTML = `<aside class="sidebar"><a class="brand" href="index.php"><img src="assets/logo-224.png" alt="Company logo"><span>GRAPHITE<small>INDUSTRIES LIMITED</small></span></a><div class="nav-label">CONTENT & MANAGEMENT</div><nav aria-label="Admin navigation">${nav.map(s => `<a href="#${s[0]}" data-tab="${s[0]}"><div><i>${s[1]}</i>${s[2]}</div><span>${s[0] === 'enquiries' ? (state.stats.new_enquiries ?? state.enquiries.filter(e => e.status === 'new').length) : ''}</span></a>`).join('')}</nav><div class="side-bottom"><a href="index.php" target="_blank">View website ↗</a><button id="logout">Sign out</button></div></aside><div class="admin-wrap"><header class="admin-top"><span>Workspace / <b id="breadcrumb">Overview</b></span><button class="mobile-admin">☰ Menu</button><span><span class="avatar">${esc(user.name.slice(0, 2).toUpperCase())}</span>${esc(user.name)} · ${esc(user.role)}</span></header><main id="admin-main"></main><footer class="admin-foot">GRAPHITE INDUSTRIES LIMITED <span>Website management workspace</span></footer></div>`;
   $$('[data-tab]').forEach(a => a.onclick = e => {
     e.preventDefault();
     location.hash = a.dataset.tab;
@@ -61,7 +73,7 @@ function shell() {
   go(location.hash.slice(1) || 'overview')
 }
 function heading(title, sub, actions = '') {
-  return `<div class="admin-heading"><div><h1>${title}</h1><p>${sub}</p></div>${actions}</div>${DEMO ? '<div class="demo-notice">DESIGN PREVIEW · Edits are browser-local. Analytics and enquiries are not connected.</div>' : ''}`
+  return `<div class="admin-heading"><div><h1>${title}</h1><p>${sub}</p></div>${actions}</div>`
 }
 function chart() {
   let d = state.stats.daily;
@@ -96,7 +108,7 @@ function renderTab(id) {
   if (tab === 'enquiries') h = heading('Enquiry inbox.', 'Review and follow up on business conversations.') + `<section class="panel"><div class="toolbar"><input id="enquiry-search" placeholder="Search enquiries…" aria-label="Search enquiries"><select id="enquiry-filter" aria-label="Filter status"><option value="">All statuses</option><option>new</option><option>progress</option><option>resolved</option></select><button class="btn secondary" id="export-enquiries">Export this page as CSV ↓</button></div><div id="enquiry-table"></div></section>`;
   if (tab === 'analytics') h = heading('Visitor analytics.', 'First-party, consent-based measurement. No stored IP addresses.') + `<div class="metric-grid">${[['Visitors', state.stats.visitors], ['Page views', state.stats.pageviews], ['Document clicks', state.stats.downloads], ['Enquiries', state.stats.enquiries ?? state.enquiries.length]].map(m => `<div class="metric"><label>${m[0]}</label><strong>${m[1]}</strong><small>${m[0] === 'Enquiries' ? 'All time' : 'Last 30 days'}</small></div>`).join('')}</div><section class="panel"><div class="panel-title"><h2>Daily page views</h2><small>Last 30 days</small></div>${chart()}</section><div class="dashboard-grid" style="margin-top:22px">${[['Top pages', state.stats.top, 'page'], ['Traffic sources', state.stats.sources, 'source']].map(t => `<section class="panel"><div class="panel-title"><h2>${t[0]}</h2></div>${t[1].length ? `<table><thead><tr><th>Name</th><th>Views</th></tr></thead><tbody>${t[1].map(r => `<tr><td>${esc(r[t[2]] || 'Direct')}</td><td>${r.views}</td></tr>`).join('')}</tbody></table>` : '<p class="fine">No recorded activity yet.</p>'}</section>`).join('')}</div><p class="fine">Visitors are browser-session identifiers, not verified unique people. Country reporting is not enabled. Counts exclude visitors who decline analytics.</p>`;
   if (tab === 'users') h = heading('Users & roles.', 'Administrators manage access. Editors manage content.', user.role === 'admin' ? '<button class="btn green" id="add-user">+ Add user</button>' : '') + `<section class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody>${state.users.map(u => `<tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${status(u.role)}</td><td>${status(Number(u.active ?? 1) ? 'active' : 'inactive')}</td><td>${u.id !== user.id ? `<button class="table-btn manage-user" data-id="${u.id}">Manage access</button>` : 'Current account'}</td></tr>`).join('')}</tbody></table></div></section>`;
-  if (tab === 'settings') h = heading('Website settings.', 'Company details, account security and recovery.') + `<div class="editor-grid"><form class="panel" id="settings-form"><h3>Company information</h3>${Object.entries(state.settings).map(([k, v]) => `<label>${esc(k.charAt(0).toUpperCase() + k.slice(1))}<input name="${esc(k)}" value="${esc(v)}" ${k === 'email' ? 'type="email"' : ''} required maxlength="500"></label>`).join('')}<button class="btn green">Save settings</button></form><div><form class="panel" id="password-form"><h3>Change your password</h3><label>Current password<input type="password" name="current" autocomplete="current-password" required></label><label>New password<input type="password" name="password" autocomplete="new-password" minlength="12" required></label><button class="btn secondary">Update password</button></form><section class="panel" style="margin-top:20px"><h3>Content backup</h3><p class="fine">Export content, settings and enquiries as JSON. Store exports securely; they contain personal enquiry data. Media files require a separate hosting backup.</p><button class="btn secondary" id="backup">Export content backup ↓</button>${DEMO ? '<button class="btn danger" id="reset-demo" style="margin-top:15px">Reset demo content</button>' : ''}</section></div></div>`;
+  if (tab === 'settings') h = heading('Website settings.', 'Company details, account security and recovery.') + `<div class="editor-grid"><form class="panel" id="settings-form"><h3>Company information</h3>${settingFields.map(([k, label, type, required, help]) => `<label>${esc(label)}${required ? '' : ' <small>(optional)</small>'}<input name="${esc(k)}" value="${esc(state.settings[k] || '')}" type="${type}" ${required ? 'required' : ''} maxlength="500">${help ? `<small class="fine">${esc(help)}</small>` : ''}</label>`).join('')}<button class="btn green">Save settings</button></form><div><form class="panel" id="password-form"><h3>Change your password</h3><label>Current password<input type="password" name="current" autocomplete="current-password" required></label><label>New password<input type="password" name="password" autocomplete="new-password" minlength="12" required></label><button class="btn secondary">Update password</button></form><section class="panel" style="margin-top:20px"><h3>Content backup</h3><p class="fine">Export content, settings and enquiries as JSON. Store exports securely; they contain personal enquiry data. Media files require a separate hosting backup.</p><button class="btn secondary" id="backup">Export content backup ↓</button></section></div></div>`;
   $('#admin-main').innerHTML = h;
   bindAdmin();
 }
@@ -130,7 +142,6 @@ function bindAdmin() {
   });
   $('#upload-form')?.addEventListener('submit', async e => {
     e.preventDefault();
-    if (DEMO) return toast('Uploads are enabled after PHP installation.');
     let b = $('button', e.target);
     b.disabled = true;
     try {
@@ -171,15 +182,11 @@ function bindAdmin() {
   });
   $('#backup')?.addEventListener('click', async () => {
     try {
-      const out = DEMO ? state : await api('export');
+      const out = await api('export');
       download('graphite-content-backup.json', JSON.stringify(out, null, 2), 'application/json')
     } catch (e) {
       toast(e.message)
     }
-  });
-  $('#reset-demo')?.addEventListener('click', () => {
-    localStorage.removeItem(demoKey);
-    location.reload()
   });
   $('#add-user')?.addEventListener('click', () => {
     openModal('<h2>Add a team member</h2><form id="user-form"><label>Name<input name="name" required maxlength="120"></label><label>Email<input name="email" type="email" required></label><label>Role<select name="role"><option value="editor">Editor</option><option value="admin">Administrator</option></select></label><label>Initial password<input name="password" type="password" minlength="12" required autocomplete="new-password"></label><button class="btn green">Create user</button></form>');
@@ -269,7 +276,6 @@ const collectionPages = { posts: 1, media: 1, enquiries: 1, users: 1 };
 const collectionQueries = {};
 
 async function fetchCollection(resource, page = 1, search = '', status = '') {
-  if (DEMO) return { items: state[resource], page: 1, pages: 1, total: state[resource].length };
   return api('list', undefined, undefined, { resource, page: String(page), search, status });
 }
 
@@ -363,7 +369,6 @@ function manageUser(id) {
 }
 
 function attachImagePicker(current) {
-  if (DEMO) return;
   const select = $('select[name=image]');
   if (!select) return;
   if (current && ![...select.options].some(o => o.value === current)) select.add(new Option(current, current, true, true));

@@ -1,0 +1,47 @@
+/* Corporate identity layer (brand guide): graphite charcoal leads, mineral silver
+   supports, forest green and gold stay restrained accents, Montserrat headings bold.
+   Loaded last on public pages only; the admin dashboard keeps its own styling. */
+:root{--brand-charcoal:#25282A;--brand-silver:#A7ADB0;--brand-silver-light:#D3D6D8;--brand-silver-pale:#E9EBEC;--brand-green:#174A3A;--brand-gold:#C6A15B;--brand-grey:#F2F3F3}
+
+/* Headings: Montserrat bold for titles, semi-bold for smaller headings. */
+h1,h2{font-weight:700;letter-spacing:-.03em}
+h3,h4{font-weight:600}
+
+/* Navigation panel in graphite charcoal. */
+.sidebar{background:var(--brand-charcoal);border-color:var(--brand-charcoal);color:var(--brand-grey)}
+.sidebar .brand{color:#fff}
+.sidebar .brand img{background:#fff;border-radius:16px;padding:6px 8px;box-sizing:border-box}
+.sidebar .brand small{color:var(--brand-silver)}
+.sidebar .nav-label{color:var(--brand-silver)}
+.sidebar nav a{color:var(--brand-silver-light)}
+.sidebar nav a span{color:var(--brand-silver)}
+.sidebar nav a:hover{background:#ffffff12;color:#fff}
+.sidebar nav a.active{background:#ffffff17;color:#fff;box-shadow:inset 3px 0 0 var(--brand-gold)}
+.sidebar nav a.active span{color:var(--brand-gold)}
+.sidebar .side-bottom{background:#ffffff0f;border:1px solid #ffffff1a;color:var(--brand-grey)}
+.sidebar .side-bottom small{color:var(--brand-silver)}
+.sidebar .side-bottom>a{color:#fff;border-color:#ffffff24}
+.sidebar .status-dot{background:var(--brand-gold)}
+.nav-close{color:#fff}
+
+/* Page headers in charcoal: title white, summary silver, labels gold. */
+.sv-hero,.page-heading,.page-cover{background:var(--brand-charcoal);color:#fff}
+.sv-hero h1,.page-heading h1,.page-cover h1{color:#fff}
+.sv-hero .lead,.page-heading .lead,.page-cover .lead{color:var(--brand-silver-light)}
+.sv-hero .kicker,.page-heading .kicker,.page-cover .kicker{color:var(--brand-gold)}
+.sv-hero .breadcrumb,.page-cover .breadcrumb{color:var(--brand-silver)}
+.sv-jump a{background:transparent;border-color:#ffffff3d;color:#fff}
+.sv-jump a:hover,.sv-jump a:focus-visible{background:var(--brand-gold);border-color:var(--brand-gold);color:var(--brand-charcoal)}
+.vp-status-hero{background:#ffffff14;color:#fff}
+.page-heading{border-radius:20px;margin:0 14px 18px;padding-top:56px;padding-bottom:56px}
+
+/* Supporting elements in mineral silver; icons in charcoal. */
+.sv-chips li:after,.vp-timeline li:after{background:var(--brand-silver-pale)}
+.sv-chips li:before,.vp-timeline li:before,.vp-tile:before,.vp-contact:before,.vp-notice[data-icon]:before{background-color:var(--brand-charcoal)}
+.sv-chips li,.vp-tile,.vp-contact,.vp-notice,.vp-news-card a{border-color:var(--brand-silver-light)}
+.vp-timeline:before{background:linear-gradient(90deg,var(--brand-silver),var(--brand-gold))}
+.vp-tags span{background:var(--brand-silver-pale);color:var(--brand-charcoal)}
+.vp-card{background:var(--brand-grey)}
+.vp-checks li:before{background-color:var(--brand-silver-pale)}
+.why-grid article{border-top-color:var(--brand-gold)}
+@media (max-width:1000px){.page-heading{margin:0 8px 14px}}

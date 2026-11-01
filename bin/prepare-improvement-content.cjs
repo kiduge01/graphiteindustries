@@ -176,5 +176,5 @@ Targets, baselines and progress reporting should be published when supported by 
   },
 };
 for (const page of seed.pages) Object.assign(page, revisions[page.id] || {});
-for (const target of ['app/seed.json', 'public/assets/seed.json']) fs.writeFileSync(path.join(root, target), JSON.stringify(seed, null, 4) + '\n');
+for (const target of ['app/seed.json']) fs.writeFileSync(path.join(root, target), JSON.stringify(seed, null, 4) + '\n');
 console.log('Reviewed content seeds prepared. Database unchanged.');

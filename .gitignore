@@ -7,3 +7,6 @@ node_modules/
 .env.*
 *.log
 /gf.zip
+
+# Source documents, archives and design studies are not web content.
+/private/

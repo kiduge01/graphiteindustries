@@ -4,8 +4,12 @@ DirectoryIndex index.php
 # A root redirect alone does not protect private application files.
 RewriteEngine On
 RewriteRule ^robots\.txt$ public/robots.php [L]
-RewriteRule ^(?:app|bin|database|storage|tests|node_modules)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:app|bin|database|deploy|design-previews|output|private|source|storage|tests|node_modules|dist)(?:/|$) - [F,L,NC]
 RewriteRule (^|/)\. - [F,L]
+# Only public/ and the root redirect are web content. Block every other file
+# placed at the project root (archives, logs, source documents, scripts).
+RewriteCond %{REQUEST_URI} !/public/
+RewriteRule ^[^/]+\.(?!php$)[A-Za-z0-9]+$ - [F,L,NC]
 
 <FilesMatch "(?i)^(?:.*\.md|package(?:-lock)?\.json|composer\.(?:json|lock))$">
     Require all denied

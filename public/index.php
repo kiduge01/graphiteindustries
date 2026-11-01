@@ -5,9 +5,20 @@ try {
     require __DIR__ . '/../app/bootstrap.php';
     require ROOT . '/app/public-content.php';
     require ROOT . '/app/public-presentation.php';
+    require ROOT . '/app/visual-pages.php';
     security_headers();
     header('Content-Type: text/html; charset=utf-8');
     $id = $_GET['page'] ?? 'home';
+    // Old ?page= links (bookmarks, search results) move permanently to clean routes.
+    // Direct index.php requests are left alone so hosts without rewriting still work.
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    if (isset($_GET['page']) && is_string($id) && str_ends_with($requestPath, '/') && preg_match('/^[a-z][a-z0-9-]{0,39}$/', $id)
+        && in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+        $params = $_GET;
+        unset($params['page']);
+        header('Location: ' . page_url($id, $params), true, 301);
+        exit;
+    }
     if ($id !== 'home') {
         $template = str_replace('media="not all"', 'media="all"', $template);
     }
@@ -15,6 +26,7 @@ try {
         $id = '__invalid';
     }
     $settings = array_column(all('SELECT * FROM settings'), 'setting_value', 'setting_key');
+    unset($settings['notify_email']);
     $pages = all("SELECT * FROM pages WHERE status='published'");
     $page = null;
     foreach ($pages as $candidate) {
@@ -23,8 +35,7 @@ try {
         }
     }
     $legal = legal_pages($settings['email'] ?? '');
-    $canonical = 'page=' . rawurlencode($id);
-    $extra = '';
+    $canonical = page_url($id);
     if (isset($legal[$id])) {
         $page = $legal[$id];
     }
@@ -35,23 +46,15 @@ try {
         if ($news && $number <= $news['pages'] && ($postId === null || $news['post'])) {
             if ($postId) {
                 $page = $news['post'];
-                $canonical .= '&post=' . $postId;
+                $canonical = page_url('news', ['post' => $postId]);
+                $newsHtml = server_news_article($news['post'], published_news(1)['posts']);
             }
             else {
                 $page = ['title' => 'News & Updates', 'summary' => 'Company announcements and verified project developments.', 'body' => ''];
-                foreach ($news['posts'] as $post) {
-                    $extra .= '<article><h2><a href="?page=news&amp;post=' . (int)$post['id'] . '">' . html_escape($post['title']) . '</a></h2><p>' . html_escape($post['summary']) . '</p></article>';
-                }
-                if (!$news['posts']) {
-                    $extra = '<p>There are no published updates yet. Contact us for current project information.</p>';
-                }
                 if ($number > 1) {
-                    $canonical .= '&newsPage=' . $number;
-                    $extra .= '<a href="?page=news&amp;newsPage=' . ($number - 1) . '">Previous updates</a> ';
+                    $canonical = page_url('news', ['newsPage' => $number]);
                 }
-                if ($number < $news['pages']) {
-                    $extra .= '<a href="?page=news&amp;newsPage=' . ($number + 1) . '">Next updates</a>';
-                }
+                $newsHtml = server_news_list($news);
             }
         }
     }
@@ -60,31 +63,32 @@ try {
         header('X-Robots-Tag: noindex');
         $page = ['title' => 'Page not found', 'summary' => 'This page is unavailable or has not been published.', 'body' => 'Use the navigation to explore available company information.'];
     }
-    else {
-        $template = str_replace('</head>', '<link rel="canonical" href="' . html_escape(public_url($canonical)) . '"></head>', $template);
-    }
     $title = $page['seo'] ?? $page['title'] . ' | Graphite Industries Limited';
     if ($title === '') {
         $title = $page['title'];
     }
+    if (http_response_code() !== 404) {
+        $template = str_replace('</head>', '<link rel="canonical" href="' . html_escape($canonical) . '">' . social_meta($page, $settings, $title, $canonical) . '</head>', $template);
+    }
+    $template = str_replace('<html lang="en" class="no-js">', '<html lang="en" class="no-js" data-page="' . html_escape($id) . '">', $template);
     $template = preg_replace_callback('~<title>.*?</title>~s', fn() => '<title>' . html_escape($title) . '</title>', $template);
     $template = preg_replace_callback('~<meta name="description"[^>]*>~', fn() => '<meta name="description" content="' . html_escape($page['summary']) . '">', $template);
-    $article = '<article class="section article-copy"><h1>' . html_escape($page['title']) . '</h1><p class="lead">' . html_escape($page['summary']) . '</p>' . body_paragraphs($page['body']) . $extra . '</article>';
-    if ($id === 'home' && http_response_code() !== 404) {
+    $notFound = http_response_code() === 404;
+    if ($notFound) {
+        $article = server_title_block('PAGE UNAVAILABLE', 'This page is not published.', 'Use the navigation to explore the available company information.');
+    } elseif (isset($legal[$id])) {
+        $article = server_title_block('WEBSITE INFORMATION', $page['title'], $page['summary']) . '<section class="section legal">' . body_paragraphs($page['body']) . ($id === 'privacy' ? '<button class="btn secondary" id="reset-consent" type="button">Change analytics preference</button>' : '') . '</section>';
+    } elseif ($id === 'home') {
         $article = server_home($page);
-    } elseif (in_array($id, ['about', 'project', 'products', 'investors', 'sustainability', 'contact'], true) && http_response_code() !== 404) {
+    } elseif (isset($newsHtml)) {
+        $article = $newsHtml;
+    } else {
         $article = server_editorial($page, $id, $settings);
     }
     $template = str_replace('<main id="main" tabindex="-1"></main>', '<main id="main" tabindex="-1">' . $article . '</main>', $template);
-    $navigation = '';
-    $labels = ['home' => 'Home', 'about' => 'About Us', 'project' => 'Our Project', 'products' => 'Products & Applications', 'sustainability' => 'Sustainability', 'investors' => 'Investors & Partners', 'contact' => 'Contact Us'];
-    foreach ($pages as $item) {
-        $navigation .= '<a' . ($item['id'] === $id ? ' class="active" aria-current="page"' : '') . ' href="?page=' . html_escape($item['id']) . '">' . html_escape($labels[$item['id']] ?? ucfirst($item['id'])) . '</a>';
-    }
-    $navigation .= '<a href="?page=news">News &amp; Updates</a><a href="?page=privacy">Privacy notice</a><a href="?page=terms">Website terms</a>';
-    $template = str_replace('<nav id="site-nav" aria-label="Main navigation"></nav>', '<nav id="site-nav" aria-label="Main navigation">' . $navigation . '</nav>', $template);
-    $imageCredits = $id === 'products' ? '<p><a href="image-credits.html">Image credits ↗</a></p>' : '';
-    $template = str_replace('<footer id="footer"></footer>', '<footer id="footer"><p>' . html_escape($settings['company'] ?? 'Graphite Industries Limited') . '</p><p>' . html_escape($settings['email'] ?? '') . '</p>' . $imageCredits . '</footer>', $template);
+    $template = str_replace('<nav id="site-nav" aria-label="Main navigation"></nav>', '<nav id="site-nav" aria-label="Main navigation">' . server_navigation($pages, $id) . '</nav>', $template);
+    $template = str_replace('<footer id="footer"></footer>', '<footer id="footer">' . server_footer($settings, !$notFound && in_array($id, ['products', 'sustainability', 'investors', 'contact', 'careers', 'news'], true), !$notFound && $id === 'home') . '</footer>', $template);
+    $template = str_replace('<body>', '<body data-page="' . html_escape($notFound ? '__missing' : $id) . '">', $template);
 }
 catch (Throwable $e) {
     error_log('Graphite page: ' . $e->getMessage());

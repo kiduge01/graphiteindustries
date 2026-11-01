@@ -1,7 +1,16 @@
 <?php
 declare(strict_types=1);
+// Humans need a few seconds to complete a form; scripted submissions are faster.
+function require_public_form(): void
+{
+    global $config;
+    session_boot();
+    if (!hash_equals($_SESSION['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) fail('Refresh this page and try again.', 403);
+    if (time() - (int)($_SESSION['form_issued'] ?? time()) < (int)($config['form_minimum_seconds'] ?? 3)) fail('Please wait a moment and try again.', 429);
+}
 if($action==='health'){
     session_boot();
+    $_SESSION['form_issued'] ??= time();
     output(['ok'=>true,'csrf'=>$_SESSION['csrf']]);
 }
 if ($action === 'public') {
@@ -15,6 +24,7 @@ if ($action === 'public') {
     if ($news['page'] > $news['pages'] || ($postId && !$news['post'])) {
         fail('News not found.', 404);
     }
+    unset($settings['notify_email']);
     output([
         'pages' => all("SELECT * FROM pages WHERE status='published'"),
         'posts' => $news['posts'],
@@ -25,8 +35,7 @@ if ($action === 'public') {
     ]);
 }
 if($action==='enquire'){
-    session_boot();
-    if(!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??''))fail('Refresh this page and try again.',403);
+    require_public_form();
     rate_limit('enquiry',5,3600);
     if(text($data,'website',500)!=='')fail('Unable to submit enquiry.');
     $name=text($data,'name',120,true);
@@ -34,7 +43,26 @@ if($action==='enquire'){
     if(!filter_var($email,FILTER_VALIDATE_EMAIL))fail('Enter a valid email.');
     $message=text($data,'message',5000,true);
     if(strlen($message)<10)fail('Please add more detail to your message.');
-    query('INSERT INTO enquiries (name,email,organisation,category,message,status,created_at) VALUES (?,?,?,?,?,?,?)',[$name,$email,text($data,'organisation',190),text($data,'category',120,true),$message,'new',gmdate('Y-m-d H:i:s')]);
+    if(preg_match_all('~https?://~i',$message)>3)fail('Please remove some links from your message.');
+    $enquiry=['name'=>$name,'email'=>$email,'organisation'=>text($data,'organisation',190),'category'=>text($data,'category',120,true),'message'=>$message];
+    query('INSERT INTO enquiries (name,email,organisation,category,message,status,created_at) VALUES (?,?,?,?,?,?,?)',[$name,$email,$enquiry['organisation'],$enquiry['category'],$message,'new',gmdate('Y-m-d H:i:s')]);
+    require_once ROOT . '/app/mailer.php';
+    notify_enquiry(array_column(all('SELECT * FROM settings'), 'setting_value', 'setting_key'), $enquiry);
+    output(['ok'=>true]);
+}
+// Update subscriptions are stored in the enquiry inbox (category "Project updates")
+// so staff can filter and export them with the existing CSV tools.
+if($action==='subscribe'){
+    require_public_form();
+    rate_limit('subscribe',5,3600);
+    if(text($data,'website',500)!=='')fail('Unable to subscribe.');
+    $email=text($data,'email',190,true);
+    if(!filter_var($email,FILTER_VALIDATE_EMAIL))fail('Enter a valid email.');
+    if(($data['consent']??'')!=='on')fail('Please accept the privacy notice to subscribe.');
+    $exists=query("SELECT id FROM enquiries WHERE email=? AND category='Project updates'",[$email])->fetch();
+    if(!$exists){
+        query('INSERT INTO enquiries (name,email,organisation,category,message,status,created_at) VALUES (?,?,?,?,?,?,?)',['Updates subscriber',$email,'','Project updates','Requested verified company updates by email through the website footer form. Consent recorded with this entry.','new',gmdate('Y-m-d H:i:s')]);
+    }
     output(['ok'=>true]);
 }
 if($action==='track'){

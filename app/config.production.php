@@ -33,4 +33,17 @@ return [
     'session_name' => 'graphite_admin',
     'secure_cookies' => true,
     'rate_limit_key' => $key,
+    // Optional enquiry notifications: set GRAPHITE_MAIL_HOST and the related variables.
+    'mail' => [
+        'enabled' => (getenv('GRAPHITE_MAIL_HOST') ?: '') !== '',
+        'transport' => 'smtp',
+        'host' => getenv('GRAPHITE_MAIL_HOST') ?: '',
+        'port' => (int)(getenv('GRAPHITE_MAIL_PORT') ?: 587),
+        'encryption' => getenv('GRAPHITE_MAIL_ENCRYPTION') ?: 'tls',
+        'username' => getenv('GRAPHITE_MAIL_USERNAME') ?: '',
+        'password' => getenv('GRAPHITE_MAIL_PASSWORD') ?: '',
+        'from' => getenv('GRAPHITE_MAIL_FROM') ?: '',
+        'from_name' => getenv('GRAPHITE_MAIL_FROM_NAME') ?: 'Graphite Industries website',
+        'to' => getenv('GRAPHITE_MAIL_TO') ?: '',
+    ],
 ];

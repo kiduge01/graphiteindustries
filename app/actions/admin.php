@@ -31,11 +31,22 @@ if ($action === 'updateUser') {
 }
 if($action==='settings'){
     require_user(true);
-    $allowed=['company','email','phone','address','tagline'];
+    $required=['company','email','phone','address','tagline'];
+    // Optional public details; blank values are hidden on the website.
+    $optional=['registration','office_hours','map_url','company_profile','linkedin','x','facebook','instagram','youtube','notify_email'];
     if(!filter_var($data['email']??'',FILTER_VALIDATE_EMAIL))fail('Enter a valid email.');
+    $values=[];
+    foreach($required as $key)$values[$key]=text($data,$key,500,true);
+    foreach($optional as $key)$values[$key]=text($data,$key,500);
+    foreach(['map_url','linkedin','x','facebook','instagram','youtube'] as $key){
+        if($values[$key]!==''&&!preg_match('~^https://[^\s"\'<>]+$~',$values[$key]))fail('Use a full https:// address for '.$key.'.');
+    }
+    if($values['company_profile']!==''&&(!preg_match('~^(assets|uploads)/[a-zA-Z0-9._/-]+\.pdf$~',$values['company_profile'])||str_contains($values['company_profile'],'..')))fail('Select an uploaded PDF for the company profile, for example uploads/file.pdf.');
+    if($values['notify_email']!==''&&!filter_var($values['notify_email'],FILTER_VALIDATE_EMAIL))fail('Enter a valid notification email.');
     db()->beginTransaction();
-    foreach($allowed as $key){
-        query('UPDATE settings SET setting_value=? WHERE setting_key=?',[text($data,$key,500,true),$key]);
+    foreach($values as $key=>$value){
+        query('DELETE FROM settings WHERE setting_key=?',[$key]);
+        query('INSERT INTO settings (setting_key,setting_value) VALUES (?,?)',[$key,$value]);
     }
     db()->commit();
     output(['ok'=>true]);

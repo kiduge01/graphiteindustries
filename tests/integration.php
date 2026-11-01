@@ -49,6 +49,7 @@ try {
         'uploads_directory' => $directory . '/uploads',
         'backup_directory' => $directory . '/backups',
         'session_directory' => $directory . '/sessions',
+        'form_minimum_seconds' => 0,
     ];
     $configFile = $directory . '/config.php';
     file_put_contents($configFile, '<?php return ' . var_export($config, true) . ';');
@@ -133,7 +134,12 @@ try {
     $homeHtml = $request('/index.php')['body'];
     check(substr_count($homeHtml, '<section ') === 3 && str_contains($homeHtml, 'Discover Mpwapwa'), 'Original homepage is rendered by the server');
     $projectHtml = $request('/index.php?page=project')['body'];
-    check(str_contains($projectHtml, 'process-chain') && str_contains($projectHtml, 'development-roadmap'), 'Processing chain and roadmap are separately rendered without JavaScript');
+    check(str_contains($projectHtml, 'class="vp-flow"') && str_contains($projectHtml, 'class="vp-timeline"') && str_contains($projectHtml, 'data-icon="site-and-land"'), 'Processing chain and roadmap are separately rendered without JavaScript');
+    $sustainabilityHtml = $request('/index.php?page=sustainability')['body'];
+    check(str_contains($sustainabilityHtml, 'sustain-page') && str_contains($sustainabilityHtml, 'data-icon="water"') && str_contains($sustainabilityHtml, '<dt>Worker safety</dt>') && !str_contains($sustainabilityHtml, '{{') && str_contains($sustainabilityHtml, 'image-credits.html'), 'Sustainability page renders its visual layout, chips, details and credits without JavaScript');
+    $contactHtml = $request('/index.php?page=contact')['body'];
+    check(str_contains($contactHtml, 'data-layout="contact"') && str_contains($contactHtml, 'id="contact-form-slot"') && str_contains($contactHtml, 'data-icon="head-office"'), 'Contact page renders its visual layout with a form slot');
+    check(str_contains($request('/index.php?page=investors')['body'], 'data-layout="investors"') && str_contains($request('/index.php?page=news')['body'], 'data-layout="news"'), 'Investors and News render their visual layouts');
     $productsHtml = $request('/index.php?page=products')['body'];
     check(str_contains($productsHtml, '<h3>Energy Storage</h3>') && str_contains($productsHtml, '<h3>Friction Materials</h3>'), 'Applications are readable without JavaScript');
     $page = array_values(array_filter($public['pages'], fn($p) => $p['id'] === 'about'))[0];
@@ -150,7 +156,7 @@ try {
     $request('/index.php?page[]=home', null, 404);
     foreach (['privacy', 'terms', 'news'] as $route) {
         $body = $request('/index.php?page=' . $route)['body'];
-        check(str_contains($body, '<article') && str_contains($body, '<link rel="canonical"'), 'Server rendering for ' . $route);
+        check((str_contains($body, 'class="section legal"') || str_contains($body, 'data-layout="news"')) && str_contains($body, '<link rel="canonical"'), 'Server rendering for ' . $route);
     }
     $request('/index.php?page=news&post=999999', null, 404);
     $api('savePost', ['title' => 'Test announcement', 'summary' => 'A summary', 'body' => 'Published test body', 'image' => '', 'status' => 'published']);
@@ -171,6 +177,23 @@ try {
     $api('enquire', ['name' => 'Test Person', 'email' => 'bad', 'category' => 'General enquiry', 'message' => 'Example test message'], 400);
     $enquiry = ['name' => 'Test Person', 'email' => 'person@example.test', 'organisation' => 'Test', 'category' => 'General enquiry', 'message' => 'Example test message'];
     $api('enquire', $enquiry);
+    $api('enquire', array_merge($enquiry, ['message' => 'http://a.test http://b.test http://c.test http://d.test']), 400);
+    $api('subscribe', ['email' => 'reader@example.test', 'website' => ''], 400);
+    $api('subscribe', ['email' => 'reader@example.test', 'consent' => 'on', 'website' => 'bot'], 400);
+    $api('subscribe', ['email' => 'reader@example.test', 'consent' => 'on', 'website' => '']);
+    $api('subscribe', ['email' => 'reader@example.test', 'consent' => 'on', 'website' => '']);
+    check($api('list&resource=enquiries&search=reader%40example.test')['total'] === 1, 'Update subscriptions are stored once in the enquiry inbox');
+    $api('settings', array_merge($public['settings'], ['linkedin' => 'javascript:alert(1)']), 400);
+    $api('settings', array_merge($public['settings'], ['company_profile' => 'uploads/../config.pdf']), 400);
+    $api('settings', array_merge($public['settings'], ['linkedin' => 'https://www.linkedin.com/company/example', 'registration' => 'Reg. no. 123', 'notify_email' => 'team@example.test', 'company_profile' => 'assets/corporate-project-brief-draft.pdf']));
+    $publicSettings = $api('public')['settings'];
+    check(!isset($publicSettings['notify_email']) && $publicSettings['linkedin'] === 'https://www.linkedin.com/company/example', 'Optional settings are public except the notification email');
+    $investorsHtml = $request('/index.php?page=investors')['body'];
+    check(str_contains($investorsHtml, 'Download company profile') && str_contains($investorsHtml, 'https://www.linkedin.com/company/example') && str_contains($investorsHtml, 'Reg. no. 123'), 'Company profile, social link and registration render without JavaScript');
+    check(str_contains($investorsHtml, 'property="og:image"') && str_contains($investorsHtml, '"@type":"Organization"') && str_contains($investorsHtml, '<link rel="canonical" href="http://example.test/graphite/public/investors">'), 'Social metadata, structured data and clean canonical URL');
+    check(!str_contains($investorsHtml, 'admin.php') && !str_contains($investorsHtml, 'team@example.test'), 'Public pages do not link the CMS or expose the notification email');
+    $legacy = $request('/?page=contact&category=Products', null, 301)['headers'];
+    check(str_contains($legacy, 'Location: http://example.test/graphite/public/contact?category=Products'), 'Legacy query links redirect permanently to clean URLs');
     $enquiries = $api('list&resource=enquiries&search=Test%20Person&status=new');
     check($enquiries['total'] === 1, 'Server enquiry search and filter');
     $api('enquiryStatus', ['id' => $enquiries['items'][0]['id'], 'status' => 'resolved']);
@@ -198,7 +221,7 @@ try {
     $api('list&resource=users', null, 403);
     $api('export', null, 403);
     $sitemap = $request('/sitemap.php')['body'];
-    check(str_contains($sitemap, 'page=privacy') && str_contains($sitemap, 'page=news&amp;post='), 'Sitemap includes legal pages and articles');
+    check(str_contains($sitemap, '/public/privacy</loc>') && str_contains($sitemap, '/public/news?post='), 'Sitemap uses clean URLs for legal pages and articles');
     check(str_contains($request('/robots.php')['body'], 'Disallow: /graphite/public/admin.php'), 'Subdirectory crawler rules');
     command(['bin/backup.php'], $environment);
     $backup = glob($directory . '/backups/*.zip')[0];

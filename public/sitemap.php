@@ -6,21 +6,21 @@ try {
     require ROOT . '/app/public-content.php';
     $urls = [];
     foreach (all("SELECT id,updated_at FROM pages WHERE status='published'") as $page) {
-        $urls[] = ['query' => 'page=' . rawurlencode($page['id']), 'modified' => $page['updated_at']];
+        $urls[] = ['loc' => page_url($page['id']), 'modified' => $page['updated_at']];
     }
     foreach (['news', 'privacy', 'terms'] as $id) {
-        $urls[] = ['query' => 'page=' . $id];
+        $urls[] = ['loc' => page_url($id)];
     }
     $count = (int)query("SELECT COUNT(*) FROM posts WHERE status='published'")->fetchColumn();
     for ($number = 2; $number <= (int)ceil($count / 20); $number++) {
-        $urls[] = ['query' => 'page=news&newsPage=' . $number];
+        $urls[] = ['loc' => page_url('news', ['newsPage' => $number])];
     }
     foreach (all("SELECT id,updated_at FROM posts WHERE status='published'") as $post) {
-        $urls[] = ['query' => 'page=news&post=' . (int)$post['id'], 'modified' => $post['updated_at']];
+        $urls[] = ['loc' => page_url('news', ['post' => (int)$post['id']]), 'modified' => $post['updated_at']];
     }
     $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
     foreach ($urls as $url) {
-        $xml .= '<url><loc>' . htmlspecialchars(public_url($url['query']), ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
+        $xml .= '<url><loc>' . htmlspecialchars($url['loc'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
         if (!empty($url['modified'])) {
             $xml .= '<lastmod>' . htmlspecialchars(substr($url['modified'], 0, 10), ENT_XML1, 'UTF-8') . '</lastmod>';
         }

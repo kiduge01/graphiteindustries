@@ -26,6 +26,14 @@ checkout's local database and administrator password are development resources.
    GRAPHITE_DB_USER=YOUR_DATABASE_USER
    GRAPHITE_DB_PASSWORD=YOUR_PRIVATE_PASSWORD
    GRAPHITE_RATE_LIMIT_KEY=YOUR_64_CHARACTER_RANDOM_HEX_KEY
+   # Optional enquiry email notifications (enabled when GRAPHITE_MAIL_HOST is set)
+   GRAPHITE_MAIL_HOST=mail.YOUR_DOMAIN
+   GRAPHITE_MAIL_PORT=587
+   GRAPHITE_MAIL_ENCRYPTION=tls
+   GRAPHITE_MAIL_USERNAME=website@YOUR_DOMAIN
+   GRAPHITE_MAIL_PASSWORD=YOUR_MAILBOX_PASSWORD
+   GRAPHITE_MAIL_FROM=website@YOUR_DOMAIN
+   GRAPHITE_MAIL_TO=team@YOUR_DOMAIN
    ```
 
    Generate the key with `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`.

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" role="img" aria-labelledby="title description">
+<title id="title">Mpwapwa area, Tanzania</title><desc id="description">Tanzania country outline with a broad marker for the Mpwapwa area in Dodoma Region. General location only; exact project boundaries are not shown.</desc>
+<rect width="600" height="480" fill="#edf2ef"/>
+<g fill="none" stroke="#dce5df" stroke-width="1"><path d="M0 120H600M0 240H600M0 360H600M120 0V480M240 0V480M360 0V480M480 0V480"/></g>
+<path d="M239.2,78.5L244.1,81.7L349.3,140.8L351.2,157.6L392.9,186.6L379.5,222.4L381.2,238.8L399.8,249.4L400.6,256.9L392.6,274.4L394.3,283.2L392.4,297.1L402.5,315.3L414.5,343.9L425.2,350.2L425.2,350.2L402.1,367.0L370.4,378.3L353.0,377.8L342.7,386.5L322.5,387.2L314.9,390.9L280.1,382.7L258.2,385.1L250.1,345.6L240.3,332.1L234.5,324.1L206.0,318.7L189.6,310.0L171.1,305.1L159.6,300.2L147.5,292.9L147.5,292.9L131.8,256.3L115.0,240.1L109.2,223.3L112.1,208.2L106.9,181.5L118.9,180.1L129.4,169.6L140.7,154.5L147.8,148.4L147.5,139.0L141.3,132.4L139.6,121.0L139.6,121.0L148.0,117.3L149.7,100.3L138.2,83.9L148.3,80.4L180.1,80.8L239.2,78.5Z" fill="#d5e1d8" stroke="#809b8a" stroke-width="1.5" stroke-linejoin="round"/>
+<g font-family="Arial,sans-serif" fill="#174a3a"><text x="40" y="45" font-size="11" letter-spacing="2">EAST AFRICA</text><text x="195" y="168" font-size="18" letter-spacing="3">TANZANIA</text>
+<circle cx="308.69999999999993" cy="245.3" r="24" fill="#174a3a" opacity=".1"/><circle cx="308.69999999999993" cy="245.3" r="13" fill="none" stroke="#174a3a" stroke-dasharray="3 3"/><circle cx="308.69999999999993" cy="245.3" r="4" fill="#174a3a"/>
+<path d="M325.69999999999993 245.3h44" stroke="#174a3a" fill="none"/><text x="374.69999999999993" y="249.3" font-size="17" font-weight="600">Mpwapwa</text><text x="374.69999999999993" y="269.3" font-size="12" fill="#535d60">Dodoma Region</text>
+<path d="M542 78V46m-5 8 5-8 5 8" stroke="#174a3a" fill="none"/><text x="538" y="36" font-size="10">N</text>
+<text x="40" y="437" font-size="11" fill="#535d60">GENERAL AREA · PROJECT BOUNDARIES NOT SHOWN</text></g></svg>

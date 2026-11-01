@@ -25,3 +25,10 @@ footer{background:var(--charcoal);color:white;border-radius:12px}.footer-top{pad
 .quiet-hero .hero-bottom span{display:inline}
 .contact-layout .check{display:block;position:relative;padding-left:25px;font-weight:400}
 .contact-layout .check input{position:absolute;left:0;top:4px;margin:0}
+
+/* The supplied site photo keeps the machinery and both workers in frame. */
+.page-cover.project-site-cover{grid-template-columns:1fr 1.05fr;overflow:hidden;align-items:stretch}
+.project-site-cover .cover-image{min-height:400px;background:#d9dedb}
+.project-site-cover .cover-image img{object-fit:cover;object-position:50% 80%;filter:none}
+@media(max-width:1000px){.page-cover.project-site-cover{grid-template-columns:1fr}.project-site-cover .cover-copy{padding:32px 7%}.project-site-cover .cover-image{aspect-ratio:16/10;height:auto;min-height:0}}
+@media(max-width:600px){.project-site-cover .cover-copy{padding:25px 7% 30px}}

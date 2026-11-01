@@ -83,7 +83,8 @@ try {
     }
     $navigation .= '<a href="?page=news">News &amp; Updates</a><a href="?page=privacy">Privacy notice</a><a href="?page=terms">Website terms</a>';
     $template = str_replace('<nav id="site-nav" aria-label="Main navigation"></nav>', '<nav id="site-nav" aria-label="Main navigation">' . $navigation . '</nav>', $template);
-    $template = str_replace('<footer id="footer"></footer>', '<footer id="footer"><p>' . html_escape($settings['company'] ?? 'Graphite Industries Limited') . '</p><p>' . html_escape($settings['email'] ?? '') . '</p></footer>', $template);
+    $imageCredits = $id === 'products' ? '<p><a href="image-credits.html">Image credits ↗</a></p>' : '';
+    $template = str_replace('<footer id="footer"></footer>', '<footer id="footer"><p>' . html_escape($settings['company'] ?? 'Graphite Industries Limited') . '</p><p>' . html_escape($settings['email'] ?? '') . '</p>' . $imageCredits . '</footer>', $template);
 }
 catch (Throwable $e) {
     error_log('Graphite page: ' . $e->getMessage());

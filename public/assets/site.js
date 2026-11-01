@@ -50,6 +50,7 @@ async function render() {
   document.body.dataset.page = id;
   document.title = p?.seo || ((id === 'news' ? (content.selectedPost?.title || 'News & Updates') : (content.legal?.[id]?.title || 'Page not found')) + ' | Graphite Industries');
   footer();
+  if (id === 'products') $('#footer .footer-grid > div:last-child')?.insertAdjacentHTML('beforeend', '<a href="image-credits.html">Image credits ↗</a>');
   bind();
   closeNavigation(false);
   track('page', id);
@@ -61,8 +62,19 @@ function contactForm(category) {
   return `<section class="section contact-layout"><div class="contact-copy"><span class="kicker">CONTACT OUR TEAM</span><h2>Good ideas begin with a conversation.</h2><p><a href="mailto:${esc(s.email)}">${esc(s.email)}</a><br><a href="tel:${esc(s.phone.replace(/\s/g, ''))}">${esc(s.phone)}</a></p><p>${esc(s.address)}</p><small>Proposed project: Mpwapwa District,<br>Dodoma Region, Tanzania.</small><p class="fine">Share non-confidential information only. Enquiries are received in our website inbox for review by the team.</p></div><form id="contact-form" class="panel"><div class="field-row"><label>Full name <span aria-hidden="true">*</span><input name="name" required maxlength="120" autocomplete="name"></label><label>Email address <span aria-hidden="true">*</span><input name="email" type="email" required maxlength="190" autocomplete="email"></label></div><label>Organisation <small>(optional)</small><input name="organisation" maxlength="190" autocomplete="organization"></label><label>Enquiry category<select name="category" aria-describedby="category-help">${categories.map(x => `<option${x === selected ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select></label><p id="category-help" class="field-help"></p><details class="buyer-details"${selected === 'Products' ? ' open' : ''}><summary>Product requirements <small>(optional)</small></summary><p class="field-help">Share whichever details you have. Specifications can be discussed later.</p>${[['application', 'Intended application'], ['quality', 'Carbon content / impurity requirements'], ['size', 'Particle or flake size'], ['demand', 'Indicative demand and time period'], ['packaging', 'Packaging'], ['destination', 'Delivery destination'], ['qualification', 'Testing or qualification needs']].map(([name, label]) => `<label>${label}<input name="buyer_${name}" maxlength="300"></label>`).join('')}</details><label>Your message <span aria-hidden="true">*</span><textarea name="message" rows="6" required minlength="10" maxlength="2600" aria-describedby="message-help"></textarea></label><small id="message-help" class="field-help">Required fields are marked *. Please include at least 10 characters.</small><label class="honey" aria-hidden="true">Leave empty<input name="website" tabindex="-1" autocomplete="off"></label><label class="check"><input name="consent" type="checkbox" required> I agree to the <a href="?page=privacy">privacy notice</a> and consent to being contacted about this enquiry.</label><button class="btn green" type="submit">Send enquiry <span aria-hidden="true">↗</span></button><p id="form-result" role="status" aria-live="polite" class="form-result">Please share non-confidential information only.</p></form></section>`;
 }
 function bind() {
+  window.initLeadershipSpotlight?.(document.querySelector('[data-leadership-spotlight]'));
   let f = $('#contact-form');
   if (f) {
+    const enquiryTopics = {
+      'mpwapwa-project': 'I would like to discuss the proposed Mpwapwa graphite project. My area of interest is ',
+      'project-information': 'Please share the available information about the proposed Mpwapwa graphite project, including its current development status. I would particularly like to know about ',
+      'graphite-concentrate': 'I would like to discuss the proposed graphite concentrate pathway. My intended application and requirements are ',
+      'micronised-graphite': 'I would like to discuss the proposed micronised graphite pathway. My intended application and requirements are ',
+      'expandable-graphite': 'I would like to discuss the proposed expandable graphite pathway. My intended application and requirements are ',
+      'battery-materials': 'I would like to discuss future battery-material requirements and the further processing and qualification they would need. My requirements are ',
+    };
+    const projectMessage = enquiryTopics[new URLSearchParams(location.search).get('topic')];
+    if (typeof projectMessage === 'string' && !f.elements.message.value) f.elements.message.value = projectMessage;
     const guidance = {
       Investment: 'Introduce your organisation, relevant project experience and the type of investment or development discussion you have in mind.',
       Products: 'Tell us about your application and requirements. Use the optional fields for any specifications you already know.',

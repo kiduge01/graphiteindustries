@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Leadership design options | Graphite Industries Limited</title>
+  <link rel="icon" href="../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="leadership-options.css">
+  <script src="leadership-options.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#concepts">Skip to design options</a>
+  <header class="preview-header">
+    <a class="brand" href="../?page=about"><img src="../assets/logo.png" width="58" height="52" alt="Graphite Industries Limited"><span>GRAPHITE<small>INDUSTRIES LIMITED</small></span></a>
+    <span class="preview-tag"><span></span> INTERACTIVE DESIGN PREVIEW</span>
+    <a class="back-link" href="../?page=about#leadership">Current About Us <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <div class="preview-intro">
+      <span class="eyebrow">PEOPLE. PURPOSE. POSSIBILITY.</span>
+      <h1>Let the people<br>make the impression.</h1>
+      <p>Three directions for your leadership section. Explore the layouts, motion and interactions using your team’s photos.</p>
+    </div>
+    <div class="concept-nav" id="concepts" role="tablist" aria-label="Leadership design options">
+      <button id="tab-cards" role="tab" aria-selected="true" aria-controls="panel-cards" data-concept="cards"><span>01</span><strong>Executive cards</strong><small>Clean &amp; approachable</small></button>
+      <button id="tab-tree" role="tab" aria-selected="false" aria-controls="panel-tree" tabindex="-1" data-concept="tree"><span>02</span><strong>Living tree</strong><small>Structured &amp; connected</small></button>
+      <button id="tab-spotlight" role="tab" aria-selected="false" aria-controls="panel-spotlight" tabindex="-1" data-concept="spotlight"><span>03</span><strong>Leadership spotlight</strong><small>Bold &amp; editorial</small></button>
+    </div>
+    <section class="concept-panel" id="panel-cards" role="tabpanel" aria-labelledby="tab-cards" tabindex="0">
+      <div class="concept-caption"><p><strong>My recommendation.</strong> A featured chairman, spacious profile cards and a separate Management section.</p><span>Scroll reveal · Hover lift · Portrait viewer</span></div>
+      <div class="cards-concept" id="cards-content"></div>
+    </section>
+    <section class="concept-panel" id="panel-tree" role="tabpanel" aria-labelledby="tab-tree" tabindex="0" hidden>
+      <div class="concept-caption"><p>A lighter take on your tree structure, with circular portraits and fine connecting lines.</p><span>Line animation · Staggered entrance · Portrait viewer</span></div>
+      <div class="tree-concept" id="tree-content"></div>
+    </section>
+    <section class="concept-panel" id="panel-spotlight" role="tabpanel" aria-labelledby="tab-spotlight" tabindex="0" hidden>
+      <div class="concept-caption"><p>A large portrait takes centre stage. Choose a name, use the arrows or play the slideshow.</p><span>Portrait transitions · Team selector · Optional slideshow</span></div>
+      <div class="spotlight-concept" id="spotlight-content"></div>
+    </section>
+    <noscript><p class="no-script">Enable JavaScript to try these interactive concepts, or <a href="../?page=about#leadership">view the current leadership section</a>.</p></noscript>
+  </main>
+  <footer class="preview-footer"><span>GRAPHITE INDUSTRIES LIMITED</span><p>Design concepts for discussion. Portraits still to be supplied are represented by initials.</p></footer>
+  <dialog id="portrait-viewer" aria-labelledby="portrait-name">
+    <button class="modal-close" type="button" aria-label="Close portrait viewer">×</button>
+    <div id="portrait-content"></div>
+  </dialog>
+</body>
+</html>

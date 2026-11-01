@@ -29,23 +29,63 @@ function subsections(body) {
 }
 function pageCover(p, id) {
   const image = safeURL(p.image);
-  return `<section class="page-cover cover-${esc(id)} ${image ? 'has-image' : ''}"><div class="cover-copy"><a class="breadcrumb" href="?page=home">Home <span aria-hidden="true">/</span></a><span class="kicker">${esc(p.eyebrow)}</span><h1>${esc(p.title)}</h1><p class="lead">${esc(p.summary)}</p></div>${image ? `<figure class="cover-image"><img src="${esc(image)}" alt="${image.includes('graphite') ? 'Close view of a graphite mineral specimen' : 'Representative industrial context, not the Mpwapwa site'}" width="1000" height="750" fetchpriority="high"><figcaption>${image.includes('graphite') ? 'Graphite mineral · illustrative' : 'Illustrative imagery · not the project site'}</figcaption></figure>` : ''}</section>`;
+  const projectSite = id === 'project' && image === 'assets/project-site.webp';
+  const alt = projectSite ? 'Mining equipment and workers at the project site' : (image.includes('graphite') ? 'Close view of a graphite mineral specimen' : 'Representative industrial context, not the Mpwapwa site');
+  const responsive = projectSite ? ' srcset="assets/project-site-640.webp 640w, assets/project-site.webp 1280w" sizes="(max-width:1000px) 100vw, 50vw"' : '';
+  const actions = id === 'project' ? '<p class="project-status"><span aria-hidden="true"></span>Development &amp; planning</p><a class="btn green" href="?page=contact&amp;category=General&amp;topic=mpwapwa-project">Discuss the Project <span aria-hidden="true">↗</span></a>' : '';
+  return `<section class="page-cover cover-${esc(id)} ${image ? 'has-image' : ''}${projectSite ? ' project-site-cover' : ''}"><div class="cover-copy"><a class="breadcrumb" href="?page=home">Home <span aria-hidden="true">/</span></a><span class="kicker">${esc(p.eyebrow)}</span><h1>${esc(p.title)}</h1><p class="lead">${esc(p.summary)}</p>${actions}</div>${image ? `<figure class="cover-image"><img src="${esc(image)}"${responsive} alt="${alt}" width="${projectSite ? 1280 : 1000}" height="${projectSite ? 1280 : 750}" fetchpriority="high"></figure>` : ''}</section>`;
 }
 function nextChapter(id, eyebrow, title, text) {
   return `<section class="next-chapter"><div><span class="kicker">${esc(eyebrow)}</span><h2>${esc(title)}</h2></div>${link(id, esc(text), 'chapter-link')}</section>`;
 }
 function homePage(p) {
-  return `<section class="hero quiet-hero"><div class="hero-image" style="background-image:url('${esc(safeURL(p.image))}')"></div><div class="hero-content"><span class="kicker">TANZANIA / GRAPHITE INDUSTRIES LIMITED</span><div class="green-rule"></div><h1>${esc(p.title)}</h1><p>${esc(p.summary)}</p>${link('project', 'Discover Mpwapwa', 'btn green')}</div><span class="image-caption">Illustrative graphite imagery</span><div class="hero-bottom">MPWAPWA, DODOMA <span>EVALUATION & PLANNING</span></div></section>
+  return `<section class="hero quiet-hero"><div class="hero-image" style="background-image:url('${esc(safeURL(p.image))}')"></div><div class="hero-content"><span class="kicker">TANZANIA / GRAPHITE INDUSTRIES LIMITED</span><div class="green-rule"></div><h1>${esc(p.title)}</h1><p>${esc(p.summary)}</p>${link('project', 'Discover Mpwapwa', 'btn green')}</div><div class="hero-bottom">MPWAPWA, DODOMA <span>EVALUATION & PLANNING</span></div></section>
   <section class="section home-introduction"><span class="kicker">MINERAL POTENTIAL. INDUSTRIAL AMBITION.</span><div><h2>A new chapter<br>for graphite in Tanzania.</h2>${link('about', 'Meet Graphite Industries')}</div></section>
   <section class="explore-grid" aria-label="Explore Graphite Industries">
-    <a href="?page=project" class="explore-tile project-tile"><img src="assets/logistics.jpg" alt="Illustrative infrastructure and logistics" loading="lazy"><span class="tile-top">01 / THE PROJECT <span aria-hidden="true">&nearr;</span></span><div><h2>Rooted in Mpwapwa.</h2><span class="tile-action">Explore our proposed development</span></div><small>Illustrative imagery</small></a>
+    <a href="?page=project" class="explore-tile project-tile"><img src="assets/logistics.jpg" alt="Illustrative infrastructure and logistics" loading="lazy"><span class="tile-top">01 / THE PROJECT <span aria-hidden="true">&nearr;</span></span><div><h2>Rooted in Mpwapwa.</h2><span class="tile-action">Explore our proposed development</span></div></a>
     <a href="?page=products" class="explore-tile mineral-tile"><img src="assets/graphite.jpg" alt="Graphite mineral" loading="lazy"><span class="tile-top">02 / POTENTIAL PRODUCTS <span aria-hidden="true">&nearr;</span></span><div><h2>Material.<br>Possibility.</h2><span class="tile-action">Explore the product pathways</span></div></a>
     <a href="?page=sustainability" class="explore-tile responsibility-tile"><span class="tile-top">03 / OUR RESPONSIBILITIES <span aria-hidden="true">&nearr;</span></span><div><h2>Progress,<br>considered.</h2><span class="tile-action">Explore our approach</span></div></a>
   </section>`;
 }
 
+function projectSteps(body, className) {
+  const copy = [], items = [];
+  for (const line of String(body || '').split('\n')) {
+    if (/^\d+\. /.test(line)) {
+      const text = line.replace(/^\d+\. /, ''), cut = text.indexOf(' — ');
+      items.push(cut < 0 ? [text] : [text.slice(0, cut), text.slice(cut + 3)]);
+    } else copy.push(line);
+  }
+  return [readableText(copy.join('\n')), items.length ? `<ol class="project-steps ${className}">${items.map(([title, description], n) => `<li><details><summary><span class="project-step-number" aria-hidden="true">${String(n + 1).padStart(2, '0')}</span><span>${esc(title)}</span></summary><div class="project-step-copy">${readableText(description || 'Further details will be shared as the project develops.')}</div></details></li>`).join('')}</ol>` : ''];
+}
+function projectPage(p) {
+  const slots = {intro:'', processIntro:'', process:'', roadmapIntro:'', roadmap:'', location:'', additional:''};
+  for (const section of contentSections(p.body)) {
+    if (!section.title) slots.intro += readableText(section.body);
+    else if (section.title === 'From feedstock to finished material') [slots.processIntro, slots.process] = projectSteps(section.body, 'project-process-steps');
+    else if (section.title === 'A development roadmap') [slots.roadmapIntro, slots.roadmap] = projectSteps(section.body, 'project-roadmap-steps');
+    else if (['Planning for the place', 'Location & Infrastructure'].includes(section.title)) slots.location = readableText(section.body);
+    else slots.additional += `<section class="section editorial-section"><h2>${esc(section.title)}</h2><div class="editorial-body">${readableText(section.body)}</div></section>`;
+  }
+  return pageCover(p, 'project') + projectLayout(slots);
+}
+
+function productsPage(p) {
+  const slots = {eyebrow:esc(p.eyebrow), title:esc(p.title), summary:esc(p.summary), intro:'', concentrateDetails:'', micronisedDetails:'', expandableDetails:'', applicationDetails:'', requirements:'', additional:''};
+  const keys = {'Graphite concentrate':'concentrateDetails', 'Micronised graphite':'micronisedDetails', 'Expandable graphite':'expandableDetails', 'Start with your requirements':'requirements'};
+  for (const section of contentSections(p.body)) {
+    if (!section.title) slots.intro += readableText(section.body);
+    else if (Object.hasOwn(keys, section.title)) slots[keys[section.title]] = readableText(section.body);
+    else if (section.title === 'Where graphite can make a difference') slots.applicationDetails = subsections(section.body).map(part => (part.title ? `<h4>${esc(part.title)}</h4>` : '') + readableText(part.body)).join('');
+    else slots.additional += `<section class="section editorial-section"><h2>${esc(section.title)}</h2><div class="editorial-body">${readableText(section.body)}</div></section>`;
+  }
+  return productsLayout(slots);
+}
+
 function editorialPage(p, id, q) {
   if (id === 'about') return aboutSampleA();
+  if (id === 'project') return projectPage(p);
+  if (id === 'products') return productsPage(p);
   let html = pageCover(p, id);
   if (id === 'contact') return html + contactForm(q.get('category'));
   let inPurpose = false;
